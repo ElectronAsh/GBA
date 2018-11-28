@@ -16,6 +16,8 @@ The simple Pong game you see running was an example from the original repo.
 
 There is no proper ROM loading support added yet, as everything is running from on-chip memory.
 
+NOTE: I need to clone and re-do the git commit, as it didn't upload the Quartus project files for MiSTer. I don't think it's due to the gitignore, so I'll fix it later.
+
 I've included the info below from the original README, as it does contain useful info about the core files...
 
 
