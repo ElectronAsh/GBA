@@ -54,7 +54,7 @@ module wave_channel (
         else begin
             position_counter <= position_counter + 4'd12;
         end
-        top_byte = !top_byte;
+        top_byte <= !top_byte;
     end
 
 

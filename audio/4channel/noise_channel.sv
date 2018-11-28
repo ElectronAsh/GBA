@@ -35,7 +35,7 @@ module noise_channel(
         endcase
     end
 
-    always_ff @(posedge frequency_timer_clock, posedge reset) begin
+    always_ff @(posedge frequency_timer_clock/*, posedge reset*/) begin		// ElectronAsh. Kludge.
         if (reset || (step7 != old_step7)) begin //if LFSR changed width 
             if (step7) begin
                 LFSR <= 7'h40;

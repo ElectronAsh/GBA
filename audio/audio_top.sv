@@ -3,34 +3,38 @@
 `include "../gba_core_defines.vh"
 
 module gba_audio_top (
-    input  logic clk_100,
-    input  logic clk_256,
-    input  logic gba_clk,
-    input  logic reset,
-    input  logic SW,
-    input  logic [3:0]  FIFO_size_A,
-    input  logic [31:0] FIFO_val_A,
-    output logic FIFO_re_A,
-    output logic FIFO_clr_A,
-    input  logic [3:0] FIFO_size_B,
-    input  logic [31:0] FIFO_val_B,
-    output logic FIFO_re_B,
-    output logic FIFO_clr_B,
-    output logic AC_ADR0,
-    output logic AC_ADR1,
-    output logic AC_GPIO0,
-    input  logic AC_GPIO1,
-    input  logic AC_GPIO2,
-    input  logic AC_GPIO3,
-    output logic AC_MCLK,
-    output logic AC_SCK,
-    inout  wire AC_SDA,
-    output logic sound_req1,
-    output logic sound_req2,
-    input logic [31:0] IO_reg_datas [`NUM_IO_REGS-1:0],
-    input logic [15:0] internal_TM0CNT_L,
-    input logic [15:0] internal_TM1CNT_L,
-    input logic dsASqRst, dsBSqRst);
+	input  logic clk_100,
+	input  logic clk_256,
+	input  logic gba_clk,
+	input  logic reset,
+	input  logic SW,
+	input  logic [3:0]  FIFO_size_A,
+	input  logic [31:0] FIFO_val_A,
+	output logic FIFO_re_A,
+	output logic FIFO_clr_A,
+	input  logic [3:0] FIFO_size_B,
+	input  logic [31:0] FIFO_val_B,
+	output logic FIFO_re_B,
+	output logic FIFO_clr_B,
+	output logic AC_ADR0,
+	output logic AC_ADR1,
+	output logic AC_GPIO0,
+	input  logic AC_GPIO1,
+	input  logic AC_GPIO2,
+	input  logic AC_GPIO3,
+	output logic AC_MCLK,
+	output logic AC_SCK,
+	inout  wire AC_SDA,
+	output logic sound_req1,
+	output logic sound_req2,
+	input logic [31:0] IO_reg_datas [`NUM_IO_REGS-1:0],
+	input logic [15:0] internal_TM0CNT_L,
+	input logic [15:0] internal_TM1CNT_L,
+	input logic dsASqRst, dsBSqRst,
+
+	output logic [23:0] output_wave_l,
+	output logic [23:0] output_wave_r
+);
 
     logic clk_100_output, clk_256_output;
     assign clk_100_output = clk_100;
@@ -38,7 +42,7 @@ module gba_audio_top (
 
     //audio codec
     logic        clk_100_buffered;
-    (* mark_debug = "true" *) logic [23:0] hphone_l, hphone_r;
+    //(* mark_debug = "true" *) logic [23:0] hphone_l, hphone_r;
     (* mark_debug = "true" *) logic        hphone_valid;
     (* mark_debug = "true" *) logic        new_sample;
     logic        sample_clk_48k;
@@ -82,8 +86,8 @@ module gba_audio_top (
     logic [15:0] SOUND_CNT_H;
     logic timer_numA;
     logic timer_numB;
-    (* mark_debug = "true" *) logic [23:0] output_wave_r;
-    (* mark_debug = "true" *) logic [23:0] output_wave_l;
+    //(* mark_debug = "true" *) logic [23:0] output_wave_r;
+    //(* mark_debug = "true" *) logic [23:0] output_wave_l;
 
     assign NR10 = IO_reg_datas[`SOUND1CNT_L_IDX][7:0];
     assign NR11 = IO_reg_datas[`SOUND1CNT_H_IDX][23:16];
@@ -122,29 +126,32 @@ module gba_audio_top (
 
     assign SOUND_CNT_H = IO_reg_datas[`SOUNDCNT_H_IDX][31:16];
 
-    audio_top top(
-    .clk_100(clk_100_buffered),
-    .AC_MCLK(AC_MCLK),
-    .AC_ADR0(AC_ADR0),
-    .AC_ADR1(AC_ADR1),
-    .AC_SCK(AC_SCK),
-    .AC_SDA(AC_SDA),
+	 /*
+	audio_top top(
+		.clk_100(clk_100_buffered),
+		.AC_MCLK(AC_MCLK),
+		.AC_ADR0(AC_ADR0),
+		.AC_ADR1(AC_ADR1),
+		.AC_SCK(AC_SCK),
+		.AC_SDA(AC_SDA),
 
-    .AC_GPIO0(AC_GPIO0),
-    .AC_GPIO1(AC_GPIO1),
-    .AC_GPIO2(AC_GPIO2),
-    .AC_GPIO3(AC_GPIO3),
+		.AC_GPIO0(AC_GPIO0),
+		.AC_GPIO1(AC_GPIO1),
+		.AC_GPIO2(AC_GPIO2),
+		.AC_GPIO3(AC_GPIO3),
 
-    .hphone_l(hphone_l),
-    .hphone_l_valid(hphone_valid),
+		.hphone_l(hphone_l),
+		.hphone_l_valid(hphone_valid),
 
-    .hphone_r(hphone_r),
-    .hphone_r_valid_dummy(hphone_valid),
+		.hphone_r(hphone_r),
+		.hphone_r_valid_dummy(hphone_valid),
 
-    .line_in_l(line_in_l),
-    .line_in_r(line_in_r),
-    .new_sample(new_sample),
-    .sample_clk_48k(sample_clk_48k));
+		.line_in_l(line_in_l),
+		.line_in_r(line_in_r),
+		.new_sample(new_sample),
+		.sample_clk_48k(sample_clk_48k)
+	);
+	*/
 
     noise n(
         .system_clock(clk_100),
@@ -238,8 +245,9 @@ module gba_audio_top (
         .sound_cnt_h(SOUND_CNT_H),
         .timer_numA,
         .timer_numB,
-        .output_wave_r,
-        .output_wave_l);
+        .output_wave_r( output_wave_r ),
+        .output_wave_l( output_wave_l )
+		);
 
     power p(
         .clock(clk_100),
@@ -250,13 +258,14 @@ module gba_audio_top (
         .reset_channel4(reset_c4));
 
     (* mark_debug = "true" *) logic [15:0] counter_100;
-    always_ff @(posedge clk_100, posedge reset) begin
+    always_ff @(posedge clk_100, posedge reset, posedge new_sample) begin
         if (reset || new_sample)
             counter_100 <= 16'b0;
         else
             counter_100 <= counter_100 + 1;
     end
     
+	 /*
     always_ff @(posedge clk_100, posedge reset) begin
         if (reset) begin
             hphone_valid <= 0;
@@ -274,11 +283,15 @@ module gba_audio_top (
             end
         end
     end
+	 */
 
+	 /*
     BUFG BUFG_inst(
         .O (clk_100_buffered),
         .I (clk_100)
-        );
+        );*/
+		  
+	assign clk_100_buffered = clk_100;	// ElectronAsh. Kludge.
 
 
 endmodule: gba_audio_top

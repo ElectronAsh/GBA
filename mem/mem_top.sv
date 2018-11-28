@@ -68,7 +68,7 @@ module mem_top (
     output logic [31:0] FIFO_val_A, FIFO_val_B,
     output logic [3:0]  FIFO_size_A, FIFO_size_B,
     input  logic        FIFO_clr_A, FIFO_clr_B
-    );
+);
 
     /* Single cycle latency for writes */
     logic [31:0] bus_addr_lat1;
@@ -159,12 +159,27 @@ module mem_top (
 
 
     // Data width set to 32bits, so addresses are aligned
+	 /*
     system_rom sys   (.clka(clock), .rsta(reset),
                       .addra(bus_system_addr[13:2]),
                       .douta(bus_system_rdata));
 
     game_rom game (.clka(clock), .rsta(reset), .addra(bus_game_addr[14:2]),
                    .douta(bus_game_rdata));
+	*/
+	
+	system_rom	system_rom_inst (
+		.clock ( clock ),
+		.address ( bus_system_addr[13:2] ),
+		.q ( bus_system_rdata )
+	);
+
+	game_rom	game_rom_inst (
+		.clock ( clock ),
+		.address ( bus_game_addr[15:2] ),
+		.q ( bus_game_rdata )
+	);
+	
 
     intern_mem intern (.clock, .reset, .bus_addr, .bus_addr_lat1, .bus_wdata,
                        .bus_we, .bus_write_lat1, .bus_rdata(bus_intern_rdata),
@@ -190,8 +205,9 @@ module mem_top (
                  .bus_rdata(bus_oam_rdata), .read_in_oam);
     
     logic [15:0] vcount_reg_low_rdata;
+	 genvar i;
     generate
-        for (genvar i = 0; i < `NUM_IO_REGS; i++) begin
+        for (i = 0; i < `NUM_IO_REGS; i++) begin : block_name
             localparam [31:0] reg_addr = `IO_REG_RAM_START + (i*4);
             assign IO_reg_en[i] = bus_addr_lat1[31:2] == reg_addr[31:2];
             assign IO_reg_we[i] = (IO_reg_en[i]) ? bus_we : 4'd0;
@@ -322,12 +338,28 @@ module intern_mem (
 
     assign bus_rdata = (in_intern_lat1) ? intern_rdata : 32'bz;
 
+	 /*
     InternRAM intern (.clka(clock), .rsta(reset),
                       .wea(intern_we), .addra(intern_addr[14:2]),
                       .douta(intern_rdata), .dina(bus_wdata),
 
                       .clkb(clock), .rstb(reset), .web(4'd0), .addrb(32'b0),
                       .doutb(), .dinb(32'b0));
+	*/
+	
+	wire intern_wren = intern_we[3] | intern_we[2] | intern_we[1] | intern_we[0];
+	
+	InternRAM	InternRAM_inst (
+		.clock ( clock ),
+	
+		.address ( intern_addr[14:2] ),
+		.byteena ( intern_we ),
+		.data ( bus_wdata ),
+		.wren ( intern_wren ),
+		.q ( intern_rdata )
+	);
+
+	
 
 endmodule: intern_mem
 
@@ -355,15 +387,34 @@ module oam_mem (
 
     assign bus_rdata = (in_oam_lat1) ? oam_rdata : 32'bz;
 
+	 /*
     OAM oam_mem  (.clka(clock), .rsta(reset),
                   .wea(oam_we), .addra(oam_addr[9:2]),
                   .douta(oam_rdata), .dina(bus_wdata),
 
                   .clkb(clock), .rstb(reset),
                   .web(4'd0), .addrb(gfx_oam_addr[9:2]),
-                  .doutb(gfx_oam_data), .dinb(32'b0));
+                  .doutb(gfx_oam_data), .dinb(32'b0));*/
+						
+	wire oam_wren = oam_we[3] | oam_we[2] | oam_we[1] | oam_we[0];
+	oam_ram	oam_ram_inst (
+		.clock ( clock ),
+	
+		.address_a ( oam_addr[9:2] ),
+		.byteena_a ( oam_we ),
+		.data_a ( bus_wdata ),
+		.wren_a ( oam_wren ),
+		.q_a ( oam_rdata ),
+		
+		.address_b ( gfx_oam_addr[9:2] ),
+		.data_b ( 32'b0 ),
+		.wren_b ( 1'b0 ),
+		.q_b ( gfx_oam_data )
+	);
+						
 
 endmodule: oam_mem
+
 
 module palette_mem (
     input logic clock, reset,
@@ -407,6 +458,7 @@ module palette_mem (
             bus_rdata = 32'bz;
     end
 
+	 /*
     palette_bg_ram pall_bg (.clka(clock), .rsta(reset),
                             .wea(palette_bg_we),
                             .addra(palette_bg_addr[8:2]),
@@ -415,8 +467,26 @@ module palette_mem (
                             .clkb(clock), .rstb(reset),
                             .web(4'd0),
                             .addrb(gfx_palette_bg_addr[8:2]),
-                            .doutb(gfx_palette_bg_data), .dinb(32'b0));
+                            .doutb(gfx_palette_bg_data), .dinb(32'b0));*/
+									 
+	wire pal_ram_bg_wren = palette_bg_we[3] | palette_bg_we[2] | palette_bg_we[1] | palette_bg_we[0];
+	pal_ram	pal_ram_bg (
+		.clock ( clock ),
+	
+		.address_a ( palette_bg_addr[8:2] ),
+		.byteena_a ( palette_bg_we ),
+		.data_a ( bus_wdata ),
+		.wren_a ( pal_ram_bg_wren ),
+		.q_a ( palette_bg_rdata ),
+		
+		.address_b ( gfx_palette_bg_addr[8:2] ),
+		.data_b ( 32'b0 ),
+		.wren_b ( 1'b0 ),
+		.q_b ( gfx_palette_bg_data )
+	);
+	
 
+	/*
     palette_obj_ram pall_obj (.clka(clock), .rsta(reset),
                               .wea(palette_obj_we),
                               .addra(palette_obj_addr[8:2]),
@@ -425,7 +495,23 @@ module palette_mem (
                               .clkb(clock), .rstb(reset),
                               .web(4'd0),
                               .addrb(gfx_palette_obj_addr[8:2]),
-                              .doutb(gfx_palette_obj_data), .dinb(32'b0));
+                              .doutb(gfx_palette_obj_data), .dinb(32'b0));*/
+										
+	wire pal_ram_obj_wren = palette_obj_we[3] | palette_obj_we[2] | palette_obj_we[1] | palette_obj_we[0];
+	pal_ram	pal_ram_obj (
+		.clock ( clock ),
+	
+		.address_a ( palette_obj_addr[8:2] ),
+		.byteena_a ( palette_obj_we ),
+		.data_a ( bus_wdata ),
+		.wren_a ( pal_ram_obj_wren ),
+		.q_a ( palette_obj_rdata ),
+		
+		.address_b ( gfx_palette_obj_addr[8:2] ),
+		.data_b ( 32'b0 ),
+		.wren_b ( 1'b0 ),
+		.q_b ( gfx_palette_obj_data )
+	);
 
 endmodule: palette_mem
 
@@ -481,38 +567,107 @@ module vram_mem (
             bus_rdata = 32'bz;
     end
 
+	 /*
     vram_A vram_A    (.clka(clock), .rsta(reset),
                       .wea(vram_A_we), .addra(vram_A_addr[15:2]),
                       .douta(vram_A_rdata), .dina(bus_wdata),
 
                       .clkb(clock), .rstb(reset),
                       .web(4'd0), .addrb(gfx_vram_A_addr[15:2]),
-                      .doutb(gfx_vram_A_data), .dinb(32'b0));
+                      .doutb(gfx_vram_A_data), .dinb(32'b0));*/
+							 
+	wire vram_wren = vram_A_we[3] | vram_A_we[2] | vram_A_we[1] | vram_A_we[0];
+	vram_a	vram_a_inst (
+		.clock ( clock ),
 
-    vram_A_2 vram_A_2 (.clka(clock), .rsta(reset),
+		.address_a ( vram_A_addr[15:2] ),
+		.byteena_a ( vram_A_we ),
+		.data_a ( bus_wdata ),
+		.wren_a ( vram_wren ),
+		.q_a ( vram_A_rdata ),
+		
+		.address_b ( gfx_vram_A_addr[15:2] ),
+		.data_b ( 32'b0 ),
+		.wren_b ( 4'd0 ),
+		.q_b ( gfx_vram_A_data )
+	);
+
+
+   /* vram_A_2 vram_A_2 (.clka(clock), .rsta(reset),
                       .wea(vram_A_we), .addra(vram_A_addr[15:2]),
                       .douta(), .dina(bus_wdata),
 
                       .clkb(clock), .rstb(reset),
                       .web(4'd0), .addrb(gfx_vram_A_addr2[15:2]),
-                      .doutb(gfx_vram_A_data2), .dinb(32'b0));
+                      .doutb(gfx_vram_A_data2), .dinb(32'b0));*/
 
+	vram_a	vram_a2_inst (
+		.clock ( clock ),
+
+		.address_a ( vram_A_addr[15:2] ),
+		.byteena_a ( vram_A_we ),
+		.data_a ( bus_wdata ),
+		.wren_a ( vram_wren ),
+		.q_a (  ),
+		
+		.address_b ( gfx_vram_A_addr2[15:2] ),
+		.data_b ( 32'b0 ),
+		.wren_b ( 4'd0 ),
+		.q_b ( gfx_vram_A_data2 )
+	);
+
+	/*
     vram_B vram_B    (.clka(clock), .rsta(reset),
                       .wea(vram_B_we), .addra(vram_B_addr[13:2]),
                       .douta(vram_B_rdata), .dina(bus_wdata),
 
                       .clkb(clock), .rstb(reset),
                       .web(4'd0), .addrb(gfx_vram_B_addr[13:2]),
-                      .doutb(gfx_vram_B_data), .dinb(32'b0));
+                      .doutb(gfx_vram_B_data), .dinb(32'b0));*/
+							 
+	wire vram_b_wren = vram_B_we[3] | vram_B_we[2] | vram_B_we[1] | vram_B_we[0];
+	vram_bc	vram_b_inst (
+		.clock ( clock ),
+		
+		.address_a ( vram_B_addr[13:2] ),
+		.byteena_a( vram_B_we ),
+		.data_a ( bus_wdata ),
+		.wren_a ( vram_b_wren ),
+		.q_a ( vram_B_rdata ),
+		
+		.address_b ( gfx_vram_B_addr[13:2] ),
+		.data_b ( 32'b0 ),
+		.wren_b ( 4'd0 ),
+		.q_b ( gfx_vram_B_data )
+	);
+
     
-    vram_C vram_C    (.clka(clock), .rsta(reset),
+    /*vram_C vram_C    (.clka(clock), .rsta(reset),
                       .wea(vram_C_we), .addra(vram_C_addr[13:2]),
                       .douta(vram_C_rdata), .dina(bus_wdata),
 
                       .clkb(clock), .rstb(reset),
                       .web(4'd0), .addrb(gfx_vram_C_addr[13:2]),
-                      .doutb(gfx_vram_C_data), .dinb(32'b0));
-    
+                      .doutb(gfx_vram_C_data), .dinb(32'b0));*/
+							 
+	wire vram_c_wren = vram_C_we[3] | vram_C_we[2] | vram_C_we[1] | vram_C_we[0];
+	vram_bc	vram_c_inst (
+		.clock ( clock ),
+		
+		.address_a ( vram_C_addr[13:2] ),
+		.byteena_a( vram_C_we ),
+		.data_a ( bus_wdata ),
+		.wren_a ( vram_c_wren ),
+		.q_a ( vram_C_rdata ),
+		
+		.address_b ( gfx_vram_C_addr[13:2] ),
+		.data_b ( 32'b0 ),
+		.wren_b ( 4'd0 ),
+		.q_b ( gfx_vram_C_data )
+	);
+
+
+
 endmodule: vram_mem
 
 /* Setup byte write enables for memory (assumes that CPU deals with
@@ -641,7 +796,7 @@ module fifo(clk, rst, data_in, we, re, full, empty, data_out, size, clr);
   assign empty = (size == 4'd0);
   assign full = (size == 4'd8);
   assign data_out = Q[getPtr];
-  always_ff @(posedge clk, posedge rst) begin
+  always_ff @(posedge clk, posedge rst, posedge clr) begin
       if (rst || clr) begin
           getPtr <= 0;
           putPtr <= 0;

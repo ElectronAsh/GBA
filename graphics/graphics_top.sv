@@ -3,17 +3,18 @@
 `include "../gba_mmio_defines.vh"
 
 module graphics_top(
-    input logic clock, reset,
+	input logic clock, reset,
 
-    input logic [31:0] gfx_vram_A_data, gfx_vram_B_data, gfx_vram_C_data,
-    input logic [31:0] gfx_oam_data, gfx_palette_bg_data, gfx_palette_obj_data,
-    input logic [31:0] gfx_vram_A_data2,
-    input logic [31:0] registers [`NUM_IO_REGS-1:0],
+	input logic [31:0] gfx_vram_A_data, gfx_vram_B_data, gfx_vram_C_data,
+	input logic [31:0] gfx_oam_data, gfx_palette_bg_data, gfx_palette_obj_data,
+	input logic [31:0] gfx_vram_A_data2,
+	input logic [31:0] registers [`NUM_IO_REGS-1:0],
 
-    output  logic [31:0] gfx_vram_A_addr, gfx_vram_B_addr, gfx_vram_C_addr,
-    output  logic [31:0] gfx_oam_addr, gfx_palette_bg_addr, gfx_palette_obj_addr,
-    output  logic [31:0] gfx_vram_A_addr2,
-    output logic [15:0] output_color);
+	output  logic [31:0] gfx_vram_A_addr, gfx_vram_B_addr, gfx_vram_C_addr,
+	output  logic [31:0] gfx_oam_addr, gfx_palette_bg_addr, gfx_palette_obj_addr,
+	output  logic [31:0] gfx_vram_A_addr2,
+	output logic [15:0] output_color
+);
 
     logic [15:0] winin;
     logic [15:0] winout;

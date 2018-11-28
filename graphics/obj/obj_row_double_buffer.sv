@@ -41,8 +41,9 @@ module obj_row_buffer (
     assign col_data = (transparent) ? 20'h0 : wdata;
 
     assign rdata = (rcol < 8'd240) ? rdata_bus : 20'b0;
+	 genvar i;
     generate
-        for (genvar i = 0; i < 240; i++) begin : REGS
+        for (i = 0; i < 240; i++) begin : REGS
             assign reg_in[i] = col_data | (reg_out[i] & 20'h4000);
             is_transparent ist (.transparent(transparent_col[i]),
                                 .data(reg_out[i][15:0]),

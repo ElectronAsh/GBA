@@ -152,13 +152,31 @@ module obj_top (
         endcase
     end
 
-    //datapath logic
-    obj_lookup_unit olu (.clock, .reset, .objname,.objx, .objy,
-                         .OAMaddr(OAMaddr_obj),
-                         .hsize(obj_hsize), .vsize(obj_vsize),
-                         .attrno, .paletteno, .objmode,
-                         .pri, .mosaic, .rotation, .dblsize, .hflip, .vflip,
-                         .palettemode, .step(stepobj), .startrow, .OAMdata(OAM_mem_data));
+	//datapath logic
+	obj_lookup_unit olu (
+		.clock( clock ),
+		.reset( reset ), 
+		
+		.objname( objname ),
+		.objx( objx ),
+		.objy( objy ),
+		.OAMaddr( OAMaddr_obj ),
+		.hsize( obj_hsize ),
+		.vsize( obj_vsize ),
+		.attrno( attrno ),
+		.paletteno( paletteno ),
+		.objmode( objmode ),
+		.pri( pri ),
+		.mosaic( mosaic ),
+		.rotation( rotation ),
+		.dblsize( dblsize ),
+		.hflip( hflip ),
+		.vflip( vflip ),
+		.palettemode( palettemode ),
+		.step( stepobj ),
+		.startrow( startrow ),
+		.OAMdata( OAM_mem_data )
+	);
 
     attribute_lookup_unit alu (.clock, .reset, .A, .B, .C, .D,
                                 .OAMaddr(OAMaddr_attr), .readOAM, .done(attr_done),

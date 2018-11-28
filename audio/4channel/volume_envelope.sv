@@ -29,7 +29,7 @@ module volume_envelope (
             old_NRx2 <= NRx2;
         end
 
-        always_ff @(posedge clock_64, posedge reset) begin
+        always_ff @(posedge clock_64/*, posedge reset*/) begin		// ElectronAsh. Kludge.
             if (update_regs || reset) begin
                 num_steps <= NRx2[2:0];
                 increase <= NRx2[3];

@@ -77,7 +77,7 @@ module int_reg (
     input  logic d, clr,
     output logic q);
 
-    always_ff @(posedge clock, posedge reset) begin
+    always_ff @(posedge clock, posedge reset, posedge clr) begin
         if (reset || clr) q <= 1'b0;
         else if (d) q <= d;
     end

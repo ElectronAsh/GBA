@@ -147,7 +147,7 @@ module controller_counter
     (output logic [WIDTH-1:0] D,
      input  logic clock, reset, enable, clear);
 
-     always_ff @(posedge clock, posedge reset) begin
+     always_ff @(posedge clock/*, posedge reset*/) begin		// ElectronAsh. Kludge.
          if (reset || clear) D <= 0;
          else if (enable) D <= D + 1;
          else D <= D;

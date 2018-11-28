@@ -38,7 +38,7 @@ module length_counter (
         old_sound_length_counter <= sound_length_counter;
     end
 
-    always_ff @(posedge clock_256, posedge reset) begin
+    always_ff @(posedge clock_256/*, posedge reset*/) begin		// ElectronAsh. Kludge.
         if (update_regs || initialization_flag || update_sound_length_counter || reset)  begin
             counter <= (NRx1[5:0] -1); //start at -1 because it includes 0
         end
