@@ -1,4 +1,24 @@
 # GBA
+
+Very early work-in-progress port to MiSTer.
+
+The original double-buffered framebuffer has been bypassed, and the native ~13.6 KHz video output routed to the VGA port on the MiSTer platform, which is obviously out-of-spec for most standard TVs / monitors, so please BEWARE.
+
+I use an external scaler box for capturing my MiSTer setup, and it's able to display out-of-spec video signals quite well.
+
+The aim was just to get the bulk of the code up-and-running, and get some video and audio output working.
+
+This was the "first light" from the core while running on MiSTer...
+
+https://drive.google.com/open?id=1MgeKzvTFTWSwcZOwXYevrLwnFRc3dcob
+
+The simple Pong game you see running was an example from the original repo.
+
+There is no proper ROM loading support added yet, as everything is running from on-chip memory.
+
+I've included the info below from the original README, as it does contain useful info about the core files...
+
+
 ### Directories
 ####audio
     audio_top.sv : top module for audio
