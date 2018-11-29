@@ -22,7 +22,7 @@ bin2mif gba_bios.bin gba_bios.mif 32
 
 The "32" at the end is very important, so it produces the correct mif file. It should then compile under Quartus.
 
-The project has been set to the "Lite" revision for MiSTer, which means it won't use the older Altera scaler core, and should compile without a full Quartus license. I believe the MiSTer project I used as a template does use the newer "Ascal" scaler for HDMI output, but none of that is properly hooked up to the GBA core as yet.
+The project has been set to the "Lite" revision for MiSTer, which means it won't use the older Altera scaler core, and should compile without a full Quartus license. I believe the MiSTer project I used as a template does use the newer "Ascal" scaler for HDMI output (in Lite mode), but none of that is properly hooked up to the GBA core as yet.
 
 VGA output is *VERY* patchy right now. It's just enough to see something happening, and the original framebuffer logic has been bypassed.
 
