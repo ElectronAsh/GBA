@@ -119,7 +119,7 @@ module mem_top (
     logic [31:0] bus_game_addr, bus_game_rdata;
     logic        bus_game_read;
 
-    logic [31:0] bus_intern_rdata, bus_palette_rdata, bus_vram_rdata;
+    logic [31:0] bus_main_mem_rdata, bus_intern_rdata, bus_palette_rdata, bus_vram_rdata;
     logic [31:0] bus_oam_rdata;
     logic  [3:0] bus_we;
 
@@ -128,7 +128,8 @@ module mem_top (
     tri0  [31:0] bus_io_reg_rdata;
     logic        bus_io_reg_read;
 
-    logic read_in_intern, read_in_palette, read_in_vram, read_in_oam;
+    logic read_in_main_mem, read_in_intern, read_in_palette, read_in_vram, read_in_oam;
+	 
     mem_decoder decoder (.addr(bus_addr_lat1), .size(bus_size_lat1),
                          .write(bus_write_lat1), .byte_we(bus_we));
 
@@ -176,15 +177,19 @@ module mem_top (
 
 	game_rom	game_rom_inst (
 		.clock ( clock ),
-		.address ( bus_game_addr[15:2] ),
+		.address ( bus_game_addr[20:2] ),
 		.q ( bus_game_rdata )
 	);
 	
 
+	 main_mem main (.clock, .reset, .bus_addr, .bus_addr_lat1, .bus_wdata,
+                       .bus_we, .bus_write_lat1, .bus_rdata(bus_main_mem_rdata),
+                       .read_in_main_mem);
+	
     intern_mem intern (.clock, .reset, .bus_addr, .bus_addr_lat1, .bus_wdata,
                        .bus_we, .bus_write_lat1, .bus_rdata(bus_intern_rdata),
                        .read_in_intern);
-
+							  
     palette_mem palette (.clock, .reset, .bus_addr, .bus_addr_lat1, .bus_wdata,
                          .bus_we, .bus_write_lat1, .gfx_palette_bg_addr,
                          .gfx_palette_obj_addr, .gfx_palette_bg_data,
@@ -295,6 +300,8 @@ module mem_top (
     always_comb begin
         if (bus_system_read)
             bus_rdata_int = bus_system_rdata;
+		  else if (read_in_main_mem)
+		      bus_rdata_int = bus_main_mem_rdata;
         else if (read_in_intern)
             bus_rdata_int = bus_intern_rdata;
         else if (read_in_vram)
@@ -315,6 +322,43 @@ module mem_top (
     end
 
 endmodule: mem_top
+
+module main_mem (
+    input logic clock, reset,
+
+    input  logic [31:0] bus_addr, bus_addr_lat1, bus_wdata,
+    input  logic  [3:0] bus_we,
+    input  logic        bus_write_lat1,
+    output logic [31:0] bus_rdata,
+    output logic        read_in_main_mem
+
+    );
+
+    logic [31:0] main_mem_addr, main_mem_rdata;
+    logic  [3:0] main_mem_we;
+    logic        in_main_mem_lat1;
+
+    assign read_in_main_mem = in_main_mem_lat1;
+    assign in_main_mem_lat1 = bus_addr_lat1[31:24] == 8'h02;
+    assign main_mem_addr = (bus_write_lat1) ? bus_addr_lat1 : bus_addr;
+    assign main_mem_we = (in_main_mem_lat1) ? bus_we : 4'd0;
+
+    assign bus_rdata = (in_main_mem_lat1) ? main_mem_rdata : 32'bz;
+	
+	wire main_mem_wren = main_mem_we[3] | main_mem_we[2] | main_mem_we[1] | main_mem_we[0];
+	
+	MainRAM	MainRAM_inst (
+		.clock ( clock ),
+	
+		.address ( main_mem_addr[17:2] ),
+		.byteena ( main_mem_we ),
+		.data ( bus_wdata ),
+		.wren ( main_mem_wren ),
+		.q ( main_mem_rdata )
+	);
+
+endmodule: main_mem
+
 
 module intern_mem (
     input logic clock, reset,
@@ -358,8 +402,6 @@ module intern_mem (
 		.wren ( intern_wren ),
 		.q ( intern_rdata )
 	);
-
-	
 
 endmodule: intern_mem
 
@@ -410,8 +452,7 @@ module oam_mem (
 		.data_b ( 32'b0 ),
 		.wren_b ( 1'b0 ),
 		.q_b ( gfx_oam_data )
-	);
-						
+	);				
 
 endmodule: oam_mem
 
@@ -514,6 +555,7 @@ module palette_mem (
 	);
 
 endmodule: palette_mem
+
 
 module vram_mem (
     input  logic clock, reset,
@@ -667,8 +709,8 @@ module vram_mem (
 	);
 
 
-
 endmodule: vram_mem
+
 
 /* Setup byte write enables for memory (assumes that CPU deals with
  * endianness!) */

@@ -42,6 +42,7 @@ module gba_top (
 	input logic [15:0] buttons
 );
 
+
     // 16.776 MHz clock for GBA/memory system
     //logic gba_clk, clk_100, clk_256, vga_clk;
 	 
@@ -78,6 +79,8 @@ module gba_top (
     (* mark_debug = "true" *) logic [31:0] bus_addr, bus_wdata, bus_rdata;
     (* mark_debug = "true" *) logic  [1:0] bus_size;
     (* mark_debug = "true" *) logic        bus_pause, bus_write;
+
+	 
     logic [31:0] gfx_vram_A_addr, gfx_vram_B_addr, gfx_vram_C_addr;
     logic [31:0] gfx_vram_A_addr2, gfx_palette_bg_addr;
     logic [31:0] gfx_oam_addr, gfx_palette_obj_addr;

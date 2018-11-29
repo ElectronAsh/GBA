@@ -433,6 +433,12 @@ assign AUDIO_R = output_wave_r[23:8];
 //
 wire [15:0] gba_buttons = {6'b111111,joystick_0[8],joystick_0[9],joystick_0[3],joystick_0[2],joystick_0[1],joystick_0[0],joystick_0[7],joystick_0[6],joystick_0[5],joystick_0[4]};
 
+reg [6:0] GBA_CLK_DIV;
+
+always @(posedge clk16 or posedge reset_gba) 
+if (reset_gba) GBA_CLK_DIV <= 0;
+else GBA_CLK_DIV <= GBA_CLK_DIV + 1'b1;
+
 
 wire reset_gba = init_reset || buttons[1] || arm_reset || download_reset;
 
@@ -440,8 +446,8 @@ gba_top gba_top_inst
 (
 	.gba_clk(clk16),		// 16.776 MHz.
 	
-	.clk_100(clk100),		// ?
-	.clk_256(clk256),		// ?
+	.clk_100(GBA_CLK_DIV[6]),		// 131,072 Hz, I think?
+	.clk_256(GBA_CLK_DIV[5]),		// 262,144 Hz, I think?
 	
 	.vga_clk(CLK_50M),	// 50.33 MHz.
 	
