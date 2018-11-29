@@ -122,7 +122,7 @@ parameter CONF_STR = {
 	"O6,Swap Joypads,No,Yes;",
 	"-;",
 	"R0,Reset;",
-	"J,A,B,X,Y,Select,Start,L,R;",
+	"J,A,B,Select,Start,L,R;",
 	"V,v0.10.",`BUILD_DATE
 };
 
@@ -139,11 +139,6 @@ wire [7:0] rom_type = (status[3:2]==0) ? 8'd0 :	// LoROM.
 							 (status[3:2]==1) ? 8'd1 :	// HiROM.
 							                    8'd5;	// ExHiROM.
 													  
-//rom_config_byte
-//wire [7:0] rom_type = (status[3:2]==0) ? 0 :	// Auto.
-//							 (status[3:2]==1) ? 0 :		// LoROM.
-//							 (status[3:2]==2) ? 1 :		// HiROM.
-//							                    5;		// ExHiROM.
 
 wire PAL = status[4];
 wire MOUSE_MODE = status[5];
@@ -381,24 +376,63 @@ wire AC_MCLK;
 wire AC_SCK;
 wire AC_SDA;
 
-wire [4:0] R;
-wire [4:0] G;
-wire [4:0] B;
-wire HSYNC;
-wire VSYNC;
-wire HBLANK = gba_hblank;	// Kludge!
-wire VBLANK = gba_vblank;	// Kludge!
+wire [4:0] GBA_R;
+wire [4:0] GBA_G;
+wire [4:0] GBA_B;
+wire GBA_HS;
+wire GBA_VS;
+wire GBA_DE;
+wire GBA_HBLANK;
+wire GBA_VBLANK;
+
 
 wire [23:0] output_wave_l;
 wire [23:0] output_wave_r;
 
-wire gba_hblank;
-wire gba_vblank;
-
 assign AUDIO_L = output_wave_l[23:8];
 assign AUDIO_R = output_wave_r[23:8];
 
-wire [15:0] gba_buttons = joystick_0;
+
+
+// joystick_0 / joystick_1 (from HPS IO, for GBA)...
+//
+// Bits 4 upwards are dependant on the "J" list in the CONF_STR, it seems.
+// Looks like Right, Left, Down, Up get assigned to the lower bits regardless. ElectronAsh.
+//
+// [15] = 
+// [14] = 
+// [13] = 
+// [12] = 
+// [11] = 
+// [10] = 
+// [9]  = R
+// [8]  = L
+// [7]  = Start
+// [6]  = Select
+// [5]  = B
+// [4]  = A
+// [3]  = UP
+// [2]  = DOWN
+// [1]  = LEFT
+// [0]  = RIGHT
+//
+//
+// GBA button mapping...
+//
+// gba_buttons[0] = // A
+// gba_buttons[1] = // B
+// gba_buttons[2] = // Select
+// gba_buttons[3] = // Start
+// gba_buttons[4] = // Right
+// gba_buttons[5] = // Left
+// gba_buttons[6] = // Down
+// gba_buttons[7] = // Up
+// gba_buttons[8] = // R
+// gba_buttons[9] = // L
+// gba_buttons[15:10] = 6'h3F; // (set these 6 bits HIGH).
+//
+wire [15:0] gba_buttons = {6'b111111,joystick_0[8],joystick_0[9],joystick_0[3],joystick_0[2],joystick_0[1],joystick_0[0],joystick_0[7],joystick_0[6],joystick_0[5],joystick_0[4]};
+
 
 wire reset_gba = init_reset || buttons[1] || arm_reset || download_reset;
 
@@ -421,11 +455,12 @@ gba_top gba_top_inst
 	
 	.LD(LD) ,				// output [7:0] LD
 	
-	.VGA_R(R) ,				// output [4:0] VGA_R
-	.VGA_G(G) ,				// output [4:0] VGA_G
-	.VGA_B(B) ,				// output [4:0] VGA_B
-	.VGA_VS(VSYNC) ,		// output  VGA_VS
-	.VGA_HS(HSYNC) ,		// output  VGA_HS
+	.VGA_R(GBA_R) ,		// output [4:0] VGA_R
+	.VGA_G(GBA_G) ,		// output [4:0] VGA_G
+	.VGA_B(GBA_B) ,		// output [4:0] VGA_B
+	.VGA_VS(GBA_VS) ,		// output  VGA_VS
+	.VGA_HS(GBA_HS) ,		// output  VGA_HS
+	.VGA_DE(GBA_DE) ,		// output  VGA_DE
 	
 	.AC_ADR0(AC_ADR0) ,	// output  AC_ADR0
 	.AC_ADR1(AC_ADR1) ,	// output  AC_ADR1
@@ -440,15 +475,25 @@ gba_top gba_top_inst
 	.output_wave_l( output_wave_l ),	// output [23:0] output_wave_l
 	.output_wave_r( output_wave_r ),	// output [23:0] output_wave_r
 	
-	.hblank( gba_hblank ),	// output hblank
-	.vblank( gba_vblank ),	// output vblank
+	.hblank( GBA_HBLANK ),	// output hblank
+	.vblank( GBA_VBLANK ),	// output vblank
 	
 	.buttons( gba_buttons )	// input [15:0] buttons
 );
 
 
+//wire [4:0] R = (GBA_DE) ? GBA_R : 5'b00000;
+//wire [4:0] G = (GBA_DE) ? GBA_G : 5'b00000;
+//wire [4:0] B = (GBA_DE) ? GBA_B : 5'b00000;
 
-assign CLK_VIDEO = CLK_50M;
+wire [4:0] R = GBA_R;
+wire [4:0] G = GBA_G;
+wire [4:0] B = GBA_B;
+
+
+//assign CLK_VIDEO = CLK_50M;
+assign CLK_VIDEO = clk16;
+
 assign VGA_SL = sl[1:0];
 
 wire [2:0] scale = status[11:9];
@@ -469,10 +514,10 @@ video_mixer #(.LINE_LENGTH(520)) video_mixer
 	.G({G,3'b000}) ,	// input [7:0] G
 	.B({B,3'b000}) ,	// input [7:0] B
 	
-	.HSync(HSYNC) ,	// input  HSync
-	.VSync(VSYNC) ,	// input  VSync
-	.HBlank(HBLANK) ,	// input  HBlank
-	.VBlank(VBLANK) ,	// input  VBlank
+	.HSync(GBA_HS) ,	// input  HSync
+	.VSync(GBA_VS) ,	// input  VSync
+	.HBlank(GBA_HBLANK) ,	// input  HBlank
+	.VBlank(GBA_VBLANK) ,	// input  VBlank
 	
 	.VGA_R(VGA_R) ,	// output [7:0] VGA_R
 	.VGA_G(VGA_G) ,	// output [7:0] VGA_G

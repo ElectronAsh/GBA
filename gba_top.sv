@@ -27,7 +27,7 @@ module gba_top (
 	output logic [7:0] LD,
 
 	output logic [4:0] VGA_R, VGA_G, VGA_B,
-	output logic VGA_VS, VGA_HS,
+	output logic VGA_VS, VGA_HS, VGA_DE,
 
 	output logic AC_ADR0, AC_ADR1, AC_GPIO0, AC_MCLK, AC_SCK,
 	input  logic AC_GPIO1, AC_GPIO2, AC_GPIO3,
@@ -94,8 +94,10 @@ module gba_top (
     assign vblank = (vcount >= 8'd160);
     assign hblank = (hcount >= 9'd240);
 	 
-	 assign VGA_VS = vcount>=160 && vcount<166;
+	 assign VGA_VS = vcount>=196 && vcount<200;
 	 assign VGA_HS = hcount>=280 && hcount<290;
+	 
+	 assign VGA_DE = !(vblank | hblank);
 	 
 	 
     assign vcount_match = (vcount == IO_reg_datas[`DISPSTAT_IDX][15:8]);

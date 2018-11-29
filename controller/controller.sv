@@ -75,7 +75,7 @@ module controller
         buttons[3] = buttons_sync[3]; // Start
         buttons[4] = buttons_sync[7]; // Right
         buttons[5] = buttons_sync[6]; // Left
-        buttons[6] = buttons_sync[4]; // Up
+        buttons[6] = buttons_sync[4]; // Up - I think the labels for Up and Down are swapped? ElectronAsh.
         buttons[7] = buttons_sync[5]; // Down
         buttons[8] = buttons_sync[11]; // R
         buttons[9] = buttons_sync[10]; // L
