@@ -92,7 +92,7 @@ module gba_top (
     assign vblank = (vcount >= 8'd160);
     assign hblank = (hcount >= 9'd240);
 	 
-	 assign VGA_VS = vcount>=176 && vcount<180;
+	 assign VGA_VS = vcount>=160 && vcount<166;
 	 assign VGA_HS = hcount>=280 && hcount<290;
 	 
 	 
