@@ -584,7 +584,7 @@
         <trigger_in_editor/>
         <trigger_out_editor/>
       </presentation>
-      <trigger CRC="F0241EAC" attribute_mem_mode="false" gap_record="true" global_temp="1" is_expanded="true" name="trigger: 2018/11/28 13:06:05  #0" position="pre" power_up_trigger_mode="false" record_data_gap="true" segment_size="512" storage_mode="off" storage_qualifier_disabled="no" storage_qualifier_port_is_pin="true" storage_qualifier_port_name="auto_stp_external_storage_qualifier" storage_qualifier_port_tap_mode="classic" trigger_type="circular">
+      <trigger CRC="F0241EAC" attribute_mem_mode="false" gap_record="true" global_temp="1" is_expanded="true" name="trigger: 2018/11/28 13:06:05  #0" position="pre" power_up_trigger_mode="false" record_data_gap="true" segment_size="512" storage_mode="off" storage_qualifier_disabled="no" storage_qualifier_port_is_pin="false" storage_qualifier_port_name="auto_stp_external_storage_qualifier" storage_qualifier_port_tap_mode="classic" trigger_type="circular">
         <power_up_trigger position="pre" storage_qualifier_disabled="no"/>
         <events use_custom_flow_control="no">
           <level enabled="yes" name="condition1" type="basic">'emu:emu|gba_top:gba_top_inst|graphics_system:gfx|vcount[0]' == low &amp;&amp; 'emu:emu|gba_top:gba_top_inst|graphics_system:gfx|vcount[1]' == low &amp;&amp; 'emu:emu|gba_top:gba_top_inst|graphics_system:gfx|vcount[2]' == low &amp;&amp; 'emu:emu|gba_top:gba_top_inst|graphics_system:gfx|vcount[3]' == low &amp;&amp; 'emu:emu|gba_top:gba_top_inst|graphics_system:gfx|vcount[4]' == low &amp;&amp; 'emu:emu|gba_top:gba_top_inst|graphics_system:gfx|vcount[5]' == low &amp;&amp; 'emu:emu|gba_top:gba_top_inst|graphics_system:gfx|vcount[6]' == low &amp;&amp; 'emu:emu|gba_top:gba_top_inst|graphics_system:gfx|vcount[7]' == low
@@ -46667,6 +46667,7 @@ LmwfYoYPiOja3qNhsWG0+KJhh9EhDqyWmuT8ohHtfONJzk9mS10Tc0NyktPY
 zOXiFz8GrwXs1X98XrlcvuDScvmcC9/0xspl51164XmuTbDB7NJ4M///XmYi
 xQ==
 
+    
     
     
     </embedded_sof_file>

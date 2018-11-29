@@ -108,17 +108,17 @@ assign {SD_SCK, SD_MOSI, SD_CS} = 'Z;
 
 `include "build_id.v"
 parameter CONF_STR = {
-	"SNES;;",
+	"GBA;;",
 	"-;",
-	"F,SFCSMCBIN;",
+	"F,GBABIN;",
 	"-;",
-	"O23,ROM Type,LoROM,HiROM,ExHiROM;",
+	"-;",
 	"-;",
 	"O4,Video Region,NTSC,PAL;",
 	"O8,Aspect ratio,4:3,16:9;",
 	"O9B,Scandoubler Fx,None,HQ2x,CRT 25%,CRT 50%,CRT 75%;",
 	"-;",
-	"O5,Joypad2 Mode,Joypad,Mouse;",
+	"-;",
 	"O6,Swap Joypads,No,Yes;",
 	"-;",
 	"R0,Reset;",
@@ -398,6 +398,8 @@ wire gba_vblank;
 assign AUDIO_L = output_wave_l[23:8];
 assign AUDIO_R = output_wave_r[23:8];
 
+wire [15:0] gba_buttons = joystick_0;
+
 wire reset_gba = init_reset || buttons[1] || arm_reset || download_reset;
 
 gba_top gba_top_inst
@@ -435,11 +437,13 @@ gba_top gba_top_inst
 	.AC_GPIO3(AC_GPIO3) ,// input  AC_GPIO3
 	.AC_SDA(AC_SDA) ,		// inout  AC_SDA
 	
-	.output_wave_l( output_wave_l ),
-	.output_wave_r( output_wave_r ),
+	.output_wave_l( output_wave_l ),	// output [23:0] output_wave_l
+	.output_wave_r( output_wave_r ),	// output [23:0] output_wave_r
 	
-	.hblank( gba_hblank ),
-	.vblank( gba_vblank )
+	.hblank( gba_hblank ),	// output hblank
+	.vblank( gba_vblank ),	// output vblank
+	
+	.buttons( gba_buttons )	// input [15:0] buttons
 );
 
 

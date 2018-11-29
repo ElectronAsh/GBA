@@ -37,7 +37,9 @@ module gba_top (
 	output logic [23:0] output_wave_r,
 
 	output logic hblank,
-	output logic vblank
+	output logic vblank,
+	
+	input logic [15:0] buttons
 );
 
     // 16.776 MHz clock for GBA/memory system
@@ -47,7 +49,7 @@ module gba_top (
 	 	 
 
     // Buttons register output
-    logic [15:0] buttons;
+    //logic [15:0] buttons;
 
     // CPU
     logic  [4:0] mode;
@@ -214,16 +216,20 @@ module gba_top (
 	);
 
 
+	/*
     // Interface for SNES controller
     controller cont (.clock(CLK_50M), .reset(BTND), .data_latch(JA2),
                      .data_clock(JA3), .serial_data(JA1), .buttons);
+	*/
 
+	/*
     // Controller for debug output on LEDs
     led_controller led (.led_reg0(IO_reg_datas[`LED_REG0_IDX]),
                         .led_reg1(IO_reg_datas[`LED_REG1_IDX]),
                         .led_reg2(IO_reg_datas[`LED_REG2_IDX]),
                         .led_reg3(IO_reg_datas[`LED_REG3_IDX]),
                         .buttons, .LD, .SW);
+	*/
 
 endmodule: gba_top
 
