@@ -12,7 +12,12 @@ This was the "first light" from the core while running on MiSTer...
 
 https://drive.google.com/open?id=1MgeKzvTFTWSwcZOwXYevrLwnFRc3dcob
 
+And this is a newer video from 29-11-18, with the HDMI output working, and the colours corrected...
+
+https://drive.google.com/open?id=1deQI7nKrbPBTZ3cRQizkrP1dLfPP0dV0
+
 The simple Pong game you see running was an example from the original repo.
+USB joypad support on MiSTer has now been added to the core.
 
 There is no proper ROM loading support added yet, as everything is running from on-chip memory.
 
@@ -22,11 +27,15 @@ bin2mif gba_bios.bin gba_bios.mif 32
 
 The "32" at the end is very important, so it produces the correct mif file. It should then compile under Quartus.
 
-The project has been set to the "Lite" revision for MiSTer, which means it won't use the older Altera scaler core, and should compile without a full Quartus license. I believe the MiSTer project I used as a template does use the newer "Ascal" scaler for HDMI output (in Lite mode), but none of that is properly hooked up to the GBA core as yet.
+Game ROMs currently need to be loaded into the on-chip memory on the DE10 Nano / MiSTer, by editing the IP block, then recompiling, or simply using the In-System Memory Content Editor from within Quartus, which can update the contents of the "ROM" block via JTAG / USB Blaster (which is built into the DE10 Nano).
+
+The ROM size is limited to 128KB atm, though, which limits it to very basic public-domain ROMs etc. They also still need to be converted to MIF files before loading into the on-chip memory.
+
+The project has been set to the "Lite" revision for MiSTer, which means it won't use the older Altera scaler core, but should compile without a full Quartus license.
 
 VGA output is *VERY* patchy right now. It's just enough to see something happening, and the original framebuffer logic has been bypassed.
 
-The video output is the next thing to fix, of course, and I'll be working on that soon. ;)
+HDMI output is now working, using the newer "Ascal" scaler by Temlib, and that also works in Lite mode.
 
 I don't know how compatible this core is with commercial games yet, but we'll see once proper ROM loading support for MiSTer is added.
 
