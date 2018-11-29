@@ -16,7 +16,19 @@ The simple Pong game you see running was an example from the original repo.
 
 There is no proper ROM loading support added yet, as everything is running from on-chip memory.
 
-NOTE: I need to clone and re-do the git commit, as it didn't upload the Quartus project files for MiSTer. I don't think it's due to the gitignore, so I'll fix it later.
+You will need to add the GBA BIOS to the root folder (GBA folder, alongside the Quartus project files), then use the included bin2mif from Command Prompt, with the following command...
+
+bin2mif gba_bios.bin gba_bios.mif 32
+
+The "32" at the end is very important, so it produces the correct mif file. It should then compile under Quartus.
+
+The project has been set to the "Lite" revision for MiSTer, which means it won't use the older Altera scaler core, and should compile without a full Quartus license. I believe the MiSTer project I used as a template does use the newer "Ascal" scaler for HDMI output, but none of that is properly hooked up to the GBA core as yet.
+
+VGA output is *VERY* patchy right now. It's just enough to see something happening, and the original framebuffer logic has been bypassed.
+
+The video output is the next thing to fix, of course, and I'll be working on that soon. ;)
+
+I don't know how compatible this core is with commercial games yet, but we'll see once proper ROM loading support for MiSTer is added.
 
 I've included the info below from the original README, as it does contain useful info about the core files...
 
