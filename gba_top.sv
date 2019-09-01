@@ -79,85 +79,94 @@ end
 	assign bus_game_rdata = CART_DI;
 
 	
-    // 16.776 MHz clock for GBA/memory system
-    //logic gba_clk, clk_100, clk_256, vga_clk;
+	// 16.776 MHz clock for GBA/memory system
+	//logic gba_clk, clk_100, clk_256, vga_clk;
+
+	//clk_wiz_0 clk0 (.clk_in1(GCLK),.gba_clk, .clk_100, .clk_256, .vga_clk);
 	 
-	 //clk_wiz_0 clk0 (.clk_in1(GCLK),.gba_clk, .clk_100, .clk_256, .vga_clk);
-	 	 
 
-    // Buttons register output
-    //logic [15:0] buttons;
+	// Buttons register output
+	//logic [15:0] buttons;
 
-    // CPU
-    logic  [4:0] mode;
-    (* mark_debug = "true" *) logic        nIRQ;
-    logic        abort;
-    logic        cpu_preemptable;
+	// CPU
+	logic  [4:0] mode;
+	(* mark_debug = "true" *) logic        nIRQ;
+	logic        abort;
+	logic        cpu_preemptable;
 
-    // Interrupt signals
-    logic [15:0] reg_IF, reg_IE, reg_ACK;
-    logic        timer0, timer1, timer2, timer3;
+	// Interrupt signals
+	logic [15:0] reg_IF, reg_IE, reg_ACK;
+	logic        timer0, timer1, timer2, timer3;
 
-    // DMA
-    (* mark_debug = "true" *) logic        dmaActive;
-    logic        dma0, dma1, dma2, dma3;
-    logic  [3:0] disable_dma;
-    logic        sound_req1, sound_req2;
+	// DMA
+	(* mark_debug = "true" *) logic        dmaActive;
+	logic        dma0, dma1, dma2, dma3;
+	logic  [3:0] disable_dma;
+	logic        sound_req1, sound_req2;
 
-    // Timer
-    (* mark_debug = "true" *) logic [15:0] internal_TM0CNT_L;
-    logic [15:0] internal_TM1CNT_L;
-    logic [15:0] internal_TM2CNT_L;
-    logic [15:0] internal_TM3CNT_L;
-    logic [15:0] TM0CNT_L, TM1CNT_L, TM2CNT_L, TM3CNT_L;
+	// Timer
+	(* mark_debug = "true" *) logic [15:0] internal_TM0CNT_L;
+	logic [15:0] internal_TM1CNT_L;
+	logic [15:0] internal_TM2CNT_L;
+	logic [15:0] internal_TM3CNT_L;
+	logic [15:0] TM0CNT_L, TM1CNT_L, TM2CNT_L, TM3CNT_L;
 
-    // Memory signals
-    (* mark_debug = "true" *) logic [31:0] bus_addr, bus_wdata, bus_rdata;
-    (* mark_debug = "true" *) logic  [1:0] bus_size;
-    (* mark_debug = "true" *) logic        bus_pause, bus_write;
+	// Memory signals
+	(* mark_debug = "true" *) logic [31:0] bus_addr, bus_wdata, bus_rdata;
+	(* mark_debug = "true" *) logic  [1:0] bus_size;
+	(* mark_debug = "true" *) logic        bus_pause, bus_write;
 
-	 // Cart bus...
-	 logic [31:0] bus_game_addr;
-	 logic [31:0] bus_game_rdata;
-	 logic bus_game_cs;
-	 
-    logic [31:0] gfx_vram_A_addr, gfx_vram_B_addr, gfx_vram_C_addr;
-    logic [31:0] gfx_vram_A_addr2, gfx_palette_bg_addr;
-    logic [31:0] gfx_oam_addr, gfx_palette_obj_addr;
-    logic [31:0] gfx_vram_A_data, gfx_vram_B_data, gfx_vram_C_data;
-    logic [31:0] gfx_vram_A_data2, gfx_palette_bg_data;
-    logic [31:0] gfx_oam_data, gfx_palette_obj_data;
+	// Cart bus...
+	logic [31:0] bus_game_addr;
+	logic [31:0] bus_game_rdata;
+	logic bus_game_cs;
 
-    logic        FIFO_re_A, FIFO_re_B, FIFO_clr_A, FIFO_clr_B;
-    logic [31:0] FIFO_val_A, FIFO_val_B;
-    logic  [3:0] FIFO_size_A, FIFO_size_B;
-    
-    //logic  vblank, hblank;
-	 logic vcount_match;
-    assign vblank = (vcount >= 8'd160);
-    assign hblank = (hcount >= 9'd240);
-	 
-	 assign VGA_VS = vcount>=196 && vcount<200;
-	 assign VGA_HS = hcount>=280 && hcount<290;
-	 
-	 wire my_vblank = (vcount>0 && vcount<6);
-	 wire my_hblank = (hcount>8 && hcount<234);
- 	 
+	logic [31:0] gfx_vram_A_addr, gfx_vram_B_addr, gfx_vram_C_addr;
+	logic [31:0] gfx_vram_A_addr2, gfx_palette_bg_addr;
+	logic [31:0] gfx_oam_addr, gfx_palette_obj_addr;
+	logic [31:0] gfx_vram_A_data, gfx_vram_B_data, gfx_vram_C_data;
+	logic [31:0] gfx_vram_A_data2, gfx_palette_bg_data;
+	logic [31:0] gfx_oam_data, gfx_palette_obj_data;
+
+	logic        FIFO_re_A, FIFO_re_B, FIFO_clr_A, FIFO_clr_B;
+	logic [31:0] FIFO_val_A, FIFO_val_B;
+	logic  [3:0] FIFO_size_A, FIFO_size_B;
+
+	//logic  vblank, hblank;
+	logic vcount_match;
+	assign vblank = (vcount >= 8'd160);
+	assign hblank = (hcount >= 9'd240);
+
+	assign VGA_VS = vcount>=196 && vcount<200;
+	assign VGA_HS = hcount>=280 && hcount<290;
 	assign VGA_DE = !(vblank | hblank);
+	
+	//wire my_vblank = (vcount>0 && vcount<6);
+	//wire my_hblank = (hcount>8 && hcount<234);
 	//assign VGA_DE = !(my_vblank | my_hblank);
-	 
-	 
-    assign vcount_match = (vcount == IO_reg_datas[`DISPSTAT_IDX][15:8]);
 
-    logic [31:0] IO_reg_datas [`NUM_IO_REGS-1:0];
 
-    logic        dsASqRst, dsBSqRst;
+	assign vcount_match = (vcount == IO_reg_datas[`DISPSTAT_IDX][15:8]);
 
-    // Graphics
-    logic [7:0] vcount;
-    logic [8:0] hcount;
+	logic [31:0] IO_reg_datas [`NUM_IO_REGS-1:0];
 
-    assign abort = 1'b0;
+	logic        dsASqRst, dsBSqRst;
+
+	// Graphics
+	logic [7:0] vcount;
+	logic [8:0] hcount;
+
+	assign abort = 1'b0;
+ 
+	// ElectronAsh.
+	wire io_write;
+	wire [31:0] int_reg_dout;
+	wire [31:0] gfx_reg_dout;
+	wire [31:0] dma_reg_dout;
+	wire [31:0] timer_reg_dout;
+	wire [31:0] aud_reg_dout;
+	
+	wire [31:0] io_reg_rdata;
 
     // CPU
 	cpu_top cpu (
@@ -165,16 +174,6 @@ end
 		.abort, .mode, .preemptable(cpu_preemptable),
 		.dmaActive, .rdata(bus_rdata), .addr(bus_addr),
 		.wdata(bus_wdata), .size(bus_size), .write(bus_write)
-	);
-
-	interrupt_controller intc (
-		.clock(gba_clk), .reset(BTND), .cpu_mode(mode), .nIRQ,
-		.ime(IO_reg_datas[`IME_IDX][0]), .reg_IF, .reg_ACK,
-		.reg_IE(IO_reg_datas[`IE_IDX][15:0]),
-		.vcount, .hcount, .set_vcount(IO_reg_datas[`DISPSTAT_IDX][15:8]),
-		.timer0, .timer1,
-		.timer2, .timer3, .serial(1'b0), .keypad(1'b0),
-		.game_pak(1'b0), .dma0, .dma1, .dma2, .dma3
 	);
 
     // BRAM memory controller
@@ -205,9 +204,29 @@ end
 		.bus_game_addr( bus_game_addr ),		// output [31:0] bus_game_addr
 		.bus_game_rdata( bus_game_rdata ),	// input [31:0] bus_game_rdata
 		
-		.bus_game_cs( bus_game_cs )			// output bus_game_cs
+		.bus_game_cs( bus_game_cs ),			// output bus_game_cs
+		
+		.io_write( io_write ),					// output io_write
+		
+		.io_reg_rdata( io_reg_rdata )			// input [31:0] io_reg_rdata (from all of the other sub-modules).
 	);
 
+	interrupt_controller intc (
+		.clock(gba_clk), .reset(BTND), .cpu_mode(mode), .nIRQ,
+		.ime(IO_reg_datas[`IME_IDX][0]), .reg_IF, .reg_ACK,
+		.reg_IE(IO_reg_datas[`IE_IDX][15:0]),
+		.vcount, .hcount, .set_vcount(IO_reg_datas[`DISPSTAT_IDX][15:8]),
+		.timer0, .timer1,
+		.timer2, .timer3, .serial(1'b0), .keypad(1'b0),
+		.game_pak(1'b0), .dma0, .dma1, .dma2, .dma3,
+		
+		.io_addr(bus_addr[11:0]),		// input [11:0] io_addr
+		.io_write(io_write),				// input io_write
+		
+		.bus_wdata( bus_wdata ),		// input [31:0] bus_wdata
+		.io_reg_rdata( io_reg_rdata )	// inout [31:0] io_reg_rdata
+	);
+	
 	graphics_system gfx (
 		.gfx_vram_A_addr, .gfx_vram_B_addr, .gfx_vram_C_addr,
 		.gfx_oam_addr, .gfx_palette_bg_addr,
@@ -220,7 +239,13 @@ end
 		.IO_reg_datas, .graphics_clock(gba_clk),
 		.vga_clock(vga_clk),
 		.reset(BTND), .vcount, .hcount,
-		.VGA_R, .VGA_G, .VGA_B/*, .VGA_HS, .VGA_VS*/
+		.VGA_R, .VGA_G, .VGA_B,/*, .VGA_HS, .VGA_VS*/
+		
+		.io_addr(bus_addr[11:0]),		// input [11:0] io_addr
+		.io_write(io_write),				// input io_write
+		
+		.bus_wdata( bus_wdata ),		// input [31:0] bus_wdata
+		.io_reg_rdata( io_reg_rdata )	// inout [31:0] io_reg_rdata
 	);
 
 	dma_top dma (
@@ -243,7 +268,13 @@ end
 		.sound_req2(sound_req2),
 		.vcount(vcount),
 		.hcount({7'd0, hcount}),
-		.cpu_preemptable(cpu_preemptable)
+		.cpu_preemptable(cpu_preemptable),
+		
+		.io_addr(bus_addr[11:0]),		// input [11:0] io_addr
+		.io_write(io_write),				// input io_write
+		//.bus_wdata( bus_wdata ),		// input [31:0] bus_wdata. (not needed, as the DMA module already has this input)
+		
+		.io_reg_rdata( io_reg_rdata )	// inout [31:0] io_reg_rdata
 	);
 
 	timer_top timers (
@@ -252,7 +283,13 @@ end
 		.internal_TM3CNT_L,
 		.TM0CNT_L, .TM1CNT_L, .TM2CNT_L, .TM3CNT_L,
 		.genIRQ0(timer0), .genIRQ1(timer1), .genIRQ2(timer2),
-		.genIRQ3(timer3)
+		.genIRQ3(timer3),
+		
+		.io_addr(bus_addr[11:0]),		// input [11:0] io_addr
+		.io_write(io_write),				// input io_write
+		.bus_wdata( bus_wdata ),		// input [31:0] bus_wdata
+		
+		.io_reg_rdata( io_reg_rdata )	// inout [31:0] io_reg_rdata
 	);
 
 	gba_audio_top audio (
@@ -266,9 +303,15 @@ end
 		.output_wave_r( output_wave_r ),
 
 		.FIFO_re_A, .FIFO_re_B, .FIFO_clr_A, .FIFO_clr_B, .FIFO_val_A,
-		.FIFO_val_B, .FIFO_size_A, .FIFO_size_B
+		.FIFO_val_B, .FIFO_size_A, .FIFO_size_B,
+		
+		.io_addr(bus_addr[11:0]),		// input [11:0] io_addr
+		.io_write(io_write),				// input io_write
+		.bus_wdata( bus_wdata ),		// input [31:0] bus_wdata
+		
+		.io_reg_rdata( io_reg_rdata )	// inout [31:0] io_reg_rdata
 	);
-
+	
 
 	/*
     // Interface for SNES controller
@@ -288,6 +331,7 @@ end
 endmodule: gba_top
 
 // LED controller for mapping debug output
+/*
 module led_controller (
     input  logic [7:0] SW,
     input  logic [31:0] led_reg0, led_reg1, led_reg2, led_reg3,
@@ -316,5 +360,6 @@ module led_controller (
         endcase
     end
 endmodule: led_controller
+*/
 
 `default_nettype wire

@@ -1,6 +1,6 @@
 // Interrupt interface from system to CPU
-
 `include "../gba_core_defines.vh"
+`include "../gba_mmio_defines.vh"
 
 module interrupt_controller(
     input  logic        clock, reset,
@@ -17,7 +17,15 @@ module interrupt_controller(
 
     input  logic        timer0, timer1, timer2, timer3,
     input  logic        serial, keypad, game_pak,
-    input  logic        dma0, dma1, dma2, dma3);
+    input  logic        dma0, dma1, dma2, dma3,
+	
+	input  logic [11:0] io_addr,
+	input  logic io_write,
+	
+	input  logic [31:0] bus_wdata,
+
+	inout logic [31:0] io_reg_rdata
+);
 
     logic [13:0] ints_recd;  // Received interrupts
     logic [13:0] int_ack;    // If interrupt is being acknowledged
@@ -54,6 +62,40 @@ module interrupt_controller(
     assign int_assert = reg_IE[13:0] & ints_recd;
     assign reg_IF = {2'b0, int_assert}; // Don't show interrupt if not enabled
 
+
+	// Interrupt regs...
+	logic [31:0] IE_REG;
+	logic [31:0] IF_REG;
+	logic [31:0] WAITCNT_REG;
+	logic [31:0] IME_REG;
+	 
+always_ff @(posedge clock or posedge reset)
+if (reset) begin
+
+end
+else begin
+	if (io_write) begin
+		case ( io_addr >> 2 )
+		`IE_IDX: IE_REG <= bus_wdata;
+		`IF_IDX: IF_REG <= bus_wdata;
+		`WAITCNT_IDX: WAITCNT_REG <= bus_wdata;
+		`IME_IDX: IME_REG <= bus_wdata;
+		default:;
+		endcase
+	end
+end
+
+always_comb begin
+		case ( io_addr >> 2 )
+		`IE_IDX: io_reg_rdata = IE_REG;
+		`IF_IDX: io_reg_rdata = IF_REG;
+		`WAITCNT_IDX: io_reg_rdata = WAITCNT_REG;
+		`IME_IDX: io_reg_rdata = IME_REG;
+		default: io_reg_rdata = 32'hzzzzzzzz;		// MUST be set as High-Z, to prevent contention with the other modules during reads! ElectronAsh.
+	endcase
+end
+	 
+	 
     int_reg vb (.d(vblank), .q(ints_recd[0]), .clr(int_ack[0]), .*);
     int_reg hb (.d(hblank), .q(ints_recd[1]), .clr(int_ack[1]), .*);
     int_reg vc (.d(vcount_match), .q(ints_recd[2]), .clr(int_ack[2]), .*);

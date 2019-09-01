@@ -19,19 +19,185 @@ module graphics_system (
 	output logic [8:0] hcount,
 	output logic [4:0] VGA_R, VGA_G, VGA_B,
 	output logic        VGA_HS,
-	output logic        VGA_VS
+	output logic        VGA_VS,
+	
+	input  logic [11:0] io_addr,
+	input  logic io_write,
+	
+	input logic [31:0] bus_wdata,
+	
+	inout logic [31:0] io_reg_rdata
 );
 
-    //module instantiations
-    logic wen, toggle;
-    logic [14:0] graphics_color, vga_color;
-    logic [16:0] graphics_addr, vga_addr;
-    logic [14:0] buffer0_dout, buffer1_dout;
-    logic [16:0] buffer0_address, buffer1_address;
-    logic [14:0] buffer0_din, buffer1_din;
-    logic buffer0_ce, buffer1_ce;
-    logic buffer0_we, buffer1_we;
+	//module instantiations
+	logic wen, toggle;
+	logic [14:0] graphics_color, vga_color;
+	logic [16:0] graphics_addr, vga_addr;
+	logic [14:0] buffer0_dout, buffer1_dout;
+	logic [16:0] buffer0_address, buffer1_address;
+	logic [14:0] buffer0_din, buffer1_din;
+	logic buffer0_ce, buffer1_ce;
+	logic buffer0_we, buffer1_we;
 
+
+	// Graphics regs...
+	logic [31:0] DISPCNT_REG;
+	logic [31:0] DISPSTAT_REG;
+	logic [31:0] VCOUNT_REG;
+	logic [31:0] BG0CNT_REG;
+	logic [31:0] BG1CNT_REG;
+	logic [31:0] BG2CNT_REG;
+	logic [31:0] BG3CNT_REG;
+
+	logic [31:0] BG0HOFS_REG;
+	logic [31:0] BG0VOFS_REG;
+	logic [31:0] BG1HOFS_REG;
+	logic [31:0] BG1VOFS_REG;
+	logic [31:0] BG2HOFS_REG;
+	logic [31:0] BG2VOFS_REG;
+	logic [31:0] BG3HOFS_REG;
+	logic [31:0] BG3VOFS_REG;
+
+	logic [31:0] BG2PA_REG;
+	logic [31:0] BG2PB_REG;
+	logic [31:0] BG2PC_REG;
+	logic [31:0] BG2PD_REG;
+	logic [31:0] BG2X_L_REG;
+	logic [31:0] BG2X_H_REG;
+	logic [31:0] BG2Y_L_REG;
+	logic [31:0] BG2Y_H_REG;
+
+	logic [31:0] BG3PA_REG;
+	logic [31:0] BG3PB_REG;
+	logic [31:0] BG3PC_REG;
+	logic [31:0] BG3PD_REG;
+	logic [31:0] BG3X_L_REG;
+	logic [31:0] BG3X_H_REG;
+	logic [31:0] BG3Y_L_REG;
+	logic [31:0] BG3Y_H_REG;
+
+	logic [31:0] WIN0H_REG;
+	logic [31:0] WIN1H_REG;
+	logic [31:0] WIN0V_REG;
+	logic [31:0] WIN1V_REG;
+	logic [31:0] WININ_REG;
+	logic [31:0] WINOUT_REG;
+	logic [31:0] MOSAIC_REG;
+
+	logic [31:0] BLDCNT_REG;
+	logic [31:0] BLDALPHA_REG;
+	logic [31:0] BLDY_REG;
+	 
+always_ff @(posedge graphics_clock or posedge reset)
+if (reset) begin
+
+end
+else begin
+	if (io_write) begin
+		case ( io_addr >> 2 )
+		`DISPCNT_IDX: DISPCNT_REG <= bus_wdata;
+		`VCOUNT_IDX: VCOUNT_REG <= bus_wdata;
+		`BG0CNT_IDX: BG0CNT_REG <= bus_wdata;
+		`BG1CNT_IDX: BG1CNT_REG <= bus_wdata;
+		`BG2CNT_IDX: BG2CNT_REG <= bus_wdata;
+		`BG3CNT_IDX: BG3CNT_REG <= bus_wdata;
+
+		`BG0HOFS_IDX: BG0HOFS_REG <= bus_wdata;
+		`BG0VOFS_IDX: BG0VOFS_REG <= bus_wdata;
+		`BG1HOFS_IDX: BG1HOFS_REG <= bus_wdata;
+		`BG1VOFS_IDX: BG1VOFS_REG <= bus_wdata;
+		`BG2HOFS_IDX: BG2HOFS_REG <= bus_wdata;
+		`BG2VOFS_IDX: BG2VOFS_REG <= bus_wdata;
+		`BG3HOFS_IDX: BG3HOFS_REG <= bus_wdata;
+		`BG3VOFS_IDX: BG3VOFS_REG <= bus_wdata;
+
+		`BG2PA_IDX: BG2PA_REG <= bus_wdata;
+		`BG2PB_IDX: BG2PB_REG <= bus_wdata;
+		`BG2PC_IDX: BG2PC_REG <= bus_wdata;
+		`BG2PD_IDX: BG2PD_REG <= bus_wdata;
+		`BG2X_L_IDX: BG2X_L_REG <= bus_wdata;
+		`BG2X_H_IDX: BG2X_H_REG <= bus_wdata;
+		`BG2Y_L_IDX: BG2Y_L_REG <= bus_wdata;
+		`BG2Y_H_IDX: BG2Y_H_REG <= bus_wdata;
+
+		`BG3PA_IDX: BG3PA_REG <= bus_wdata;
+		`BG3PB_IDX: BG3PB_REG <= bus_wdata;
+		`BG3PC_IDX: BG3PC_REG <= bus_wdata;
+		`BG3PD_IDX: BG3PD_REG <= bus_wdata;
+		`BG3X_L_IDX: BG3X_L_REG <= bus_wdata;
+		`BG3X_H_IDX: BG3X_H_REG <= bus_wdata;
+		`BG3Y_L_IDX: BG3Y_L_REG <= bus_wdata;
+		`BG3Y_H_IDX: BG3Y_H_REG <= bus_wdata;
+
+		`WIN0H_IDX: WIN0H_REG <= bus_wdata;
+		`WIN1H_IDX: WIN1H_REG <= bus_wdata;
+		`WIN0V_IDX: WIN0V_REG <= bus_wdata;
+		`WIN1V_IDX: WIN1V_REG <= bus_wdata;
+		`WININ_IDX: WININ_REG <= bus_wdata;
+		`WINOUT_IDX: WINOUT_REG <= bus_wdata;
+		`MOSAIC_IDX: MOSAIC_REG <= bus_wdata;
+
+		`BLDCNT_IDX: BLDCNT_REG <= bus_wdata;
+		`BLDALPHA_IDX: BLDALPHA_REG <= bus_wdata;
+		`BLDY_IDX: BLDY_REG <= bus_wdata;
+		default:;
+		endcase
+	end
+end
+
+always_comb begin
+		case ( io_addr >> 2 )
+		`DISPCNT_IDX: io_reg_rdata = DISPCNT_REG;
+
+		`VCOUNT_IDX: io_reg_rdata = VCOUNT_REG;
+       //`VCOUNT_IDX: io_reg_rdata = {vcount,  13'b0000000000000, vcount_match, hblank, vblank};
+
+		`BG0CNT_IDX: io_reg_rdata = BG0CNT_REG;
+		`BG1CNT_IDX: io_reg_rdata = BG1CNT_REG;
+		`BG2CNT_IDX: io_reg_rdata = BG2CNT_REG;
+		`BG3CNT_IDX: io_reg_rdata = BG3CNT_REG;
+
+		`BG0HOFS_IDX: io_reg_rdata = BG0HOFS_REG;
+		`BG0VOFS_IDX: io_reg_rdata = BG0VOFS_REG;
+		`BG1HOFS_IDX: io_reg_rdata = BG1HOFS_REG;
+		`BG1VOFS_IDX: io_reg_rdata = BG1VOFS_REG;
+		`BG2HOFS_IDX: io_reg_rdata = BG2HOFS_REG;
+		`BG2VOFS_IDX: io_reg_rdata = BG2VOFS_REG;
+		`BG3HOFS_IDX: io_reg_rdata = BG3HOFS_REG;
+		`BG3VOFS_IDX: io_reg_rdata = BG3VOFS_REG;
+
+		`BG2PA_IDX: io_reg_rdata = BG2PA_REG;
+		`BG2PB_IDX: io_reg_rdata = BG2PB_REG;
+		`BG2PC_IDX: io_reg_rdata = BG2PC_REG;
+		`BG2PD_IDX: io_reg_rdata = BG2PD_REG;
+		`BG2X_L_IDX: io_reg_rdata = BG2X_L_REG;
+		`BG2X_H_IDX: io_reg_rdata = BG2X_H_REG;
+		`BG2Y_L_IDX: io_reg_rdata = BG2Y_L_REG;
+		`BG2Y_H_IDX: io_reg_rdata = BG2Y_H_REG;
+
+		`BG3PA_IDX: io_reg_rdata = BG3PA_REG;
+		`BG3PB_IDX: io_reg_rdata = BG3PB_REG;
+		`BG3PC_IDX: io_reg_rdata = BG3PC_REG;
+		`BG3PD_IDX: io_reg_rdata = BG3PD_REG;
+		`BG3X_L_IDX: io_reg_rdata = BG3X_L_REG;
+		`BG3X_H_IDX: io_reg_rdata = BG3X_H_REG;
+		`BG3Y_L_IDX: io_reg_rdata = BG3Y_L_REG;
+		`BG3Y_H_IDX: io_reg_rdata = BG3Y_H_REG;
+
+		`WIN0H_IDX: io_reg_rdata = WIN0H_REG;
+		`WIN1H_IDX: io_reg_rdata = WIN1H_REG;
+		`WIN0V_IDX: io_reg_rdata = WIN0V_REG;
+		`WIN1V_IDX: io_reg_rdata = WIN1V_REG;
+		`WININ_IDX: io_reg_rdata = WININ_REG;
+		`WINOUT_IDX: io_reg_rdata = WINOUT_REG;
+		`MOSAIC_IDX: io_reg_rdata = MOSAIC_REG;
+
+		`BLDCNT_IDX: io_reg_rdata = BLDCNT_REG;
+		`BLDALPHA_IDX: io_reg_rdata = BLDALPHA_REG;
+		`BLDY_IDX: io_reg_rdata = BLDY_REG;
+		default: io_reg_rdata = 32'hzzzzzzzz;		// MUST be set as High-Z, to prevent contention with the other modules during reads! ElectronAsh.
+	endcase
+end
 
     //dbl_buffer buffers
 	/*

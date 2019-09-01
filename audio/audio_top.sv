@@ -33,7 +33,14 @@ module gba_audio_top (
 	input logic dsASqRst, dsBSqRst,
 
 	output logic [23:0] output_wave_l,
-	output logic [23:0] output_wave_r
+	output logic [23:0] output_wave_r,
+	
+	input  logic [11:0] io_addr,
+	input  logic io_write,
+	
+	input logic [31:0] bus_wdata,
+	
+	inout logic [31:0] io_reg_rdata
 );
 
     logic clk_100_output, clk_256_output;
@@ -125,6 +132,105 @@ module gba_audio_top (
     assign NR52 = IO_reg_datas[`SOUNDCNT_X_IDX][7:0];
 
     assign SOUND_CNT_H = IO_reg_datas[`SOUNDCNT_H_IDX][31:16];
+
+	// Audio regs...
+	logic [31:0] SOUND1CNT_L_REG;
+	logic [31:0] SOUND1CNT_H_REG;
+	logic [31:0] SOUND1CNT_X_REG;
+	logic [31:0] SOUND2CNT_L_REG;
+	logic [31:0] SOUND2CNT_H_REG;
+	logic [31:0] SOUND3CNT_L_REG;
+	logic [31:0] SOUND3CNT_H_REG;
+	logic [31:0] SOUND3CNT_X_REG;
+	logic [31:0] SOUND4CNT_L_REG;
+	logic [31:0] SOUND4CNT_H_REG;
+	logic [31:0] SOUNDCNT_L_REG;
+	logic [31:0] SOUNDCNT_H_REG;
+	logic [31:0] SOUNDCNT_X_REG;
+	logic [31:0] SOUNDBIAS_REG;
+	logic [31:0] WAVE_RAM0_L_REG;
+	logic [31:0] WAVE_RAM0_H_REG;
+	logic [31:0] WAVE_RAM1_L_REG;
+	logic [31:0] WAVE_RAM1_H_REG;
+	logic [31:0] WAVE_RAM2_L_REG;
+	logic [31:0] WAVE_RAM2_H_REG;
+	logic [31:0] WAVE_RAM3_L_REG;
+	logic [31:0] WAVE_RAM3_H_REG;
+	logic [31:0] FIFO_A_L_REG;
+	logic [31:0] FIFO_A_H_REG;
+	logic [31:0] FIFO_B_L_REG;
+	logic [31:0] FIFO_B_H_REG;
+	 
+always_ff @(posedge gba_clk or posedge reset)
+if (reset) begin
+
+end
+else begin
+	if (io_write) begin
+		case ( io_addr >> 2 )
+		`SOUND1CNT_L_IDX: SOUND1CNT_L_REG <= bus_wdata;
+		`SOUND1CNT_H_IDX: SOUND1CNT_H_REG <= bus_wdata;
+		`SOUND1CNT_X_IDX: SOUND1CNT_X_REG <= bus_wdata;
+		`SOUND2CNT_L_IDX: SOUND2CNT_L_REG <= bus_wdata;
+		`SOUND2CNT_H_IDX: SOUND2CNT_H_REG <= bus_wdata;
+		`SOUND3CNT_L_IDX: SOUND3CNT_L_REG <= bus_wdata;
+		`SOUND3CNT_H_IDX: SOUND3CNT_H_REG <= bus_wdata;
+		`SOUND3CNT_X_IDX: SOUND3CNT_X_REG <= bus_wdata;
+		`SOUND4CNT_L_IDX: SOUND4CNT_L_REG <= bus_wdata;
+		`SOUND4CNT_H_IDX: SOUND4CNT_H_REG <= bus_wdata;
+		`SOUNDCNT_L_IDX: SOUNDCNT_L_REG <= bus_wdata;
+		`SOUNDCNT_H_IDX: SOUNDCNT_H_REG <= bus_wdata;
+		`SOUNDCNT_X_IDX: SOUNDCNT_X_REG <= bus_wdata;
+		`SOUNDBIAS_IDX: SOUNDBIAS_REG <= bus_wdata;
+		`WAVE_RAM0_L_IDX: WAVE_RAM0_L_REG <= bus_wdata;
+		`WAVE_RAM0_H_IDX: WAVE_RAM0_H_REG <= bus_wdata;
+		`WAVE_RAM1_L_IDX: WAVE_RAM1_L_REG <= bus_wdata;
+		`WAVE_RAM1_H_IDX: WAVE_RAM1_H_REG <= bus_wdata;
+		`WAVE_RAM2_L_IDX: WAVE_RAM2_L_REG <= bus_wdata;
+		`WAVE_RAM2_H_IDX: WAVE_RAM2_H_REG <= bus_wdata;
+		`WAVE_RAM3_L_IDX: WAVE_RAM3_L_REG <= bus_wdata;
+		`WAVE_RAM3_H_IDX: WAVE_RAM3_H_REG <= bus_wdata;
+		`FIFO_A_L: FIFO_A_L_REG <= bus_wdata;
+		`FIFO_A_H: FIFO_A_H_REG <= bus_wdata;
+		`FIFO_B_L: FIFO_B_L_REG <= bus_wdata;
+		`FIFO_B_H: FIFO_B_H_REG <= bus_wdata;
+		default:;
+		endcase
+	end
+end
+
+
+always_comb begin
+		case ( io_addr >> 2 )
+		`SOUND1CNT_L_IDX: io_reg_rdata = SOUND1CNT_L_REG;
+		`SOUND1CNT_H_IDX: io_reg_rdata = SOUND1CNT_H_REG;
+		`SOUND1CNT_X_IDX: io_reg_rdata = SOUND1CNT_X_REG;
+		`SOUND2CNT_L_IDX: io_reg_rdata = SOUND2CNT_L_REG;
+		`SOUND2CNT_H_IDX: io_reg_rdata = SOUND2CNT_H_REG;
+		`SOUND3CNT_L_IDX: io_reg_rdata = SOUND3CNT_L_REG;
+		`SOUND3CNT_H_IDX: io_reg_rdata = SOUND3CNT_H_REG;
+		`SOUND3CNT_X_IDX: io_reg_rdata = SOUND3CNT_X_REG;
+		`SOUND4CNT_L_IDX: io_reg_rdata = SOUND4CNT_L_REG;
+		`SOUND4CNT_H_IDX: io_reg_rdata = SOUND4CNT_H_REG;
+		`SOUNDCNT_L_IDX: io_reg_rdata = SOUNDCNT_L_REG;
+		`SOUNDCNT_H_IDX: io_reg_rdata = SOUNDCNT_H_REG;
+		`SOUNDCNT_X_IDX: io_reg_rdata = SOUNDCNT_X_REG;
+		`SOUNDBIAS_IDX: io_reg_rdata = SOUNDBIAS_REG;
+		`WAVE_RAM0_L_IDX: io_reg_rdata = WAVE_RAM0_L_REG;
+		`WAVE_RAM0_H_IDX: io_reg_rdata = WAVE_RAM0_H_REG;
+		`WAVE_RAM1_L_IDX: io_reg_rdata = WAVE_RAM1_L_REG;
+		`WAVE_RAM1_H_IDX: io_reg_rdata = WAVE_RAM1_H_REG;
+		`WAVE_RAM2_L_IDX: io_reg_rdata = WAVE_RAM2_L_REG;
+		`WAVE_RAM2_H_IDX: io_reg_rdata = WAVE_RAM2_H_REG;
+		`WAVE_RAM3_L_IDX: io_reg_rdata = WAVE_RAM3_L_REG;
+		`WAVE_RAM3_H_IDX: io_reg_rdata = WAVE_RAM3_H_REG;
+		`FIFO_A_L: io_reg_rdata = FIFO_A_L_REG;
+		`FIFO_A_H: io_reg_rdata = FIFO_A_H_REG;
+		`FIFO_B_L: io_reg_rdata = FIFO_B_L_REG;
+		`FIFO_B_H: io_reg_rdata = FIFO_B_H_REG;
+		default: io_reg_rdata = 32'hzzzzzzzz;		// MUST be set as High-Z, to prevent contention with the other modules during reads! ElectronAsh.
+	endcase
+end
 
 	 /*
 	audio_top top(

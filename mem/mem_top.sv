@@ -72,11 +72,17 @@ module mem_top (
 	 output logic [31:0] bus_game_addr,
 	 input logic [31:0] bus_game_rdata,
 	 
-	 output wire bus_game_cs
+	 output wire bus_game_cs,
+	 
+	 output logic io_write,
+	 
+	input logic [31:0] io_reg_rdata
 );
 
 	assign bus_game_cs = bus_game_read;
 
+	assign io_write = ((bus_addr_lat1 - `IO_REG_RAM_START) <= `IO_REG_RAM_SIZE) && bus_write;
+	
 
     /* Single cycle latency for writes */
     logic [31:0] bus_addr_lat1;
@@ -134,7 +140,8 @@ module mem_top (
     logic [3:0]  IO_reg_we [`NUM_IO_REGS-1:0];
     logic [`NUM_IO_REGS-1:0] IO_reg_en;
     tri0  [31:0] bus_io_reg_rdata;
-    logic        bus_io_reg_read;
+	 
+	 logic bus_io_reg_read;
 
     logic read_in_main_mem, read_in_intern, read_in_palette, read_in_vram, read_in_oam;
 	 
@@ -341,8 +348,7 @@ module main_mem (
     input  logic        bus_write_lat1,
     output logic [31:0] bus_rdata,
     output logic        read_in_main_mem
-
-    );
+);
 
     logic [31:0] main_mem_addr, main_mem_rdata;
     logic  [3:0] main_mem_we;

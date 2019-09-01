@@ -2,7 +2,6 @@
 `include "../gba_core_defines.vh"
 `include "../gba_mmio_defines.vh"
 
-
 module dma_fsm
   (input  logic mem_wait, dma_repeat,  
    input  logic enable, start,
@@ -372,7 +371,7 @@ module dma_unit
    input  logic sound, sound_req,
 
    input  logic clk, rst_b
-   );
+);
 
   logic fsm_disable;
   logic xferDone;
@@ -421,7 +420,15 @@ module dma_top
    output logic        active,
    output logic        irq0, irq1, irq2, irq3,
 
-   input  logic clk, rst_b);
+   input  logic clk, rst_b,
+
+	input  logic [11:0] io_addr,
+	input  logic io_write,
+	
+	input  logic [31:0] bus_wdata,
+
+	inout logic [31:0] io_reg_rdata
+);
 
    logic [15:0] controlL0, controlH0;
    logic [15:0] srcAddrL0, srcAddrH0;
@@ -480,7 +487,98 @@ module dma_top
    assign allowed_to_begin = ~mid_process[0] && ~mid_process[1]
                              && ~mid_process[2] && ~mid_process[3];
 
+	// DMA regs...
+	logic [31:0] DMA0SAD_L_REG;
+	logic [31:0] DMA0SAD_H_REG;
+	logic [31:0] DMA0DAD_L_REG;
+	logic [31:0] DMA0DAD_H_REG;
+	logic [31:0] DMA0CNT_L_REG;
+	logic [31:0] DMA0CNT_H_REG;
+	logic [31:0] DMA1SAD_L_REG;
+	logic [31:0] DMA1SAD_H_REG;
+	logic [31:0] DMA1DAD_L_REG;
+	logic [31:0] DMA1DAD_H_REG;
+	logic [31:0] DMA1CNT_L_REG;
+	logic [31:0] DMA1CNT_H_REG;
+	logic [31:0] DMA2SAD_L_REG;
+	logic [31:0] DMA2SAD_H_REG;
+	logic [31:0] DMA2DAD_L_REG;
+	logic [31:0] DMA2DAD_H_REG;
+	logic [31:0] DMA2CNT_L_REG;
+	logic [31:0] DMA2CNT_H_REG;
+	logic [31:0] DMA3SAD_L_REG;
+	logic [31:0] DMA3SAD_H_REG;
+	logic [31:0] DMA3DAD_L_REG;
+	logic [31:0] DMA3DAD_H_REG;
+	logic [31:0] DMA3CNT_L_REG;
+	logic [31:0] DMA3CNT_H_REG;
+	
+always_ff @(posedge clk or negedge rst_b)
+if (!rst_b) begin
 
+end
+else begin
+	if (io_write) begin
+		case ( io_addr >> 2 )
+		`DMA0SAD_L_IDX: DMA0SAD_L_REG <= bus_wdata;
+		`DMA0SAD_H_IDX: DMA0SAD_H_REG <= bus_wdata;
+		`DMA0DAD_L_IDX: DMA0DAD_L_REG <= bus_wdata;
+		`DMA0DAD_H_IDX: DMA0DAD_H_REG <= bus_wdata;
+		`DMA0CNT_L_IDX: DMA0CNT_L_REG <= bus_wdata;
+		`DMA0CNT_H_IDX: DMA0CNT_H_REG <= bus_wdata;
+		`DMA1SAD_L_IDX: DMA1SAD_L_REG <= bus_wdata;
+		`DMA1SAD_H_IDX: DMA1SAD_H_REG <= bus_wdata;
+		`DMA1DAD_L_IDX: DMA1DAD_L_REG <= bus_wdata;
+		`DMA1DAD_H_IDX: DMA1DAD_H_REG <= bus_wdata;
+		`DMA1CNT_L_IDX: DMA1CNT_L_REG <= bus_wdata;
+		`DMA1CNT_H_IDX: DMA1CNT_H_REG <= bus_wdata;
+		`DMA2SAD_L_IDX: DMA2SAD_L_REG <= bus_wdata;
+		`DMA2SAD_H_IDX: DMA2SAD_H_REG <= bus_wdata;
+		`DMA2DAD_L_IDX: DMA2DAD_L_REG <= bus_wdata;
+		`DMA2DAD_H_IDX: DMA2DAD_H_REG <= bus_wdata;
+		`DMA2CNT_L_IDX: DMA2CNT_L_REG <= bus_wdata;
+		`DMA2CNT_H_IDX: DMA2CNT_H_REG <= bus_wdata;
+		`DMA3SAD_L_IDX: DMA3SAD_L_REG <= bus_wdata;
+		`DMA3SAD_H_IDX: DMA3SAD_H_REG <= bus_wdata;
+		`DMA3DAD_L_IDX: DMA3DAD_L_REG <= bus_wdata;
+		`DMA3DAD_H_IDX: DMA3DAD_H_REG <= bus_wdata;
+		`DMA3CNT_L_IDX: DMA3CNT_L_REG <= bus_wdata;
+		`DMA3CNT_H_IDX: DMA3CNT_H_REG <= bus_wdata;
+		default:;
+		endcase
+	end
+end
+			
+always_comb begin
+		case ( io_addr >> 2 )
+		`DMA0SAD_L_IDX: io_reg_rdata = DMA0SAD_L_REG;
+		`DMA0SAD_H_IDX: io_reg_rdata = DMA0SAD_H_REG;
+		`DMA0DAD_L_IDX: io_reg_rdata = DMA0DAD_L_REG;
+		`DMA0DAD_H_IDX: io_reg_rdata = DMA0DAD_H_REG;
+		`DMA0CNT_L_IDX: io_reg_rdata = DMA0CNT_L_REG;
+		`DMA0CNT_H_IDX: io_reg_rdata = DMA0CNT_H_REG;
+		`DMA1SAD_L_IDX: io_reg_rdata = DMA1SAD_L_REG;
+		`DMA1SAD_H_IDX: io_reg_rdata = DMA1SAD_H_REG;
+		`DMA1DAD_L_IDX: io_reg_rdata = DMA1DAD_L_REG;
+		`DMA1DAD_H_IDX: io_reg_rdata = DMA1DAD_H_REG;
+		`DMA1CNT_L_IDX: io_reg_rdata = DMA1CNT_L_REG;
+		`DMA1CNT_H_IDX: io_reg_rdata = DMA1CNT_H_REG;
+		`DMA2SAD_L_IDX: io_reg_rdata = DMA2SAD_L_REG;
+		`DMA2SAD_H_IDX: io_reg_rdata = DMA2SAD_H_REG;
+		`DMA2DAD_L_IDX: io_reg_rdata = DMA2DAD_L_REG;
+		`DMA2DAD_H_IDX: io_reg_rdata = DMA2DAD_H_REG;
+		`DMA2CNT_L_IDX: io_reg_rdata = DMA2CNT_L_REG;
+		`DMA2CNT_H_IDX: io_reg_rdata = DMA2CNT_H_REG;
+		`DMA3SAD_L_IDX: io_reg_rdata = DMA3SAD_L_REG;
+		`DMA3SAD_H_IDX: io_reg_rdata = DMA3SAD_H_REG;
+		`DMA3DAD_L_IDX: io_reg_rdata = DMA3DAD_L_REG;
+		`DMA3DAD_H_IDX: io_reg_rdata = DMA3DAD_H_REG;
+		`DMA3CNT_L_IDX: io_reg_rdata = DMA3CNT_L_REG;
+		`DMA3CNT_H_IDX: io_reg_rdata = DMA3CNT_H_REG;
+		default: io_reg_rdata = 32'hzzzzzzzz;		// MUST be set as High-Z, to prevent contention with the other modules during reads! ElectronAsh.
+	endcase
+end
+			
    dma_unit dma0(.controlL(controlL0), .controlH(controlH0),
                  .srcAddrL(srcAddrL0), .srcAddrH(srcAddrH0),
                  .destAddrL(destAddrL0), .destAddrH(destAddrH0),
