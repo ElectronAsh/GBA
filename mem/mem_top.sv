@@ -67,8 +67,16 @@ module mem_top (
     input  logic        FIFO_re_A, FIFO_re_B,
     output logic [31:0] FIFO_val_A, FIFO_val_B,
     output logic [3:0]  FIFO_size_A, FIFO_size_B,
-    input  logic        FIFO_clr_A, FIFO_clr_B
+    input  logic        FIFO_clr_A, FIFO_clr_B,
+	 
+	 output logic [31:0] bus_game_addr,
+	 input logic [31:0] bus_game_rdata,
+	 
+	 output wire bus_game_cs
 );
+
+	assign bus_game_cs = bus_game_read;
+
 
     /* Single cycle latency for writes */
     logic [31:0] bus_addr_lat1;
@@ -116,7 +124,7 @@ module mem_top (
     logic [31:0] bus_pak_init_1_addr;
     logic        bus_pak_init_1_read;
 
-    logic [31:0] bus_game_addr, bus_game_rdata;
+    //logic [31:0] bus_game_addr, bus_game_rdata;
     logic        bus_game_read;
 
     logic [31:0] bus_main_mem_rdata, bus_intern_rdata, bus_palette_rdata, bus_vram_rdata;
@@ -137,9 +145,10 @@ module mem_top (
     assign bus_game_addr = bus_mem_addr;
 
     assign bus_system_read = bus_addr_lat1[31:24] == 8'h0;
-    assign bus_game_read = (bus_addr_lat1[31:24] == 8'h08) ||
-                           (bus_addr_lat1[31:24] == 8'h0A) ||
-                           (bus_addr_lat1[31:24] == 8'h0C);
+	 
+    assign bus_game_read =  (bus_addr[31:24] == 8'h08) ||
+                            (bus_addr[31:24] == 8'h0A) ||
+                            (bus_addr[31:24] == 8'h0C);
 
     assign bus_io_reg_read = (bus_addr_lat1 - `IO_REG_RAM_START) <= `IO_REG_RAM_SIZE;
 
@@ -175,12 +184,13 @@ module mem_top (
 		.q ( bus_system_rdata )
 	);
 
+	/*
 	game_rom	game_rom_inst (
 		.clock ( clock ),
 		.address ( bus_game_addr[20:2] ),
 		.q ( bus_game_rdata )
 	);
-	
+	*/
 
 	 main_mem main (.clock, .reset, .bus_addr, .bus_addr_lat1, .bus_wdata,
                        .bus_we, .bus_write_lat1, .bus_rdata(bus_main_mem_rdata),

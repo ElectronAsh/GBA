@@ -1,4 +1,4 @@
-/* Top module for the CPU. Wrapper for ARM7TDMIS_Top, since VHDL is annoying,
+/* Top module for the CPU. Wrapper for arm7tdmis_top, since VHDL is annoying,
  * and it's nice to not have signals in gba_top be all caps
  */
 
@@ -18,10 +18,10 @@ module cpu_top (
     logic  [1:0] size_int;
     logic        write_int;
 
-    ARM7TDMIS_Top cpu (.CLK(clock), .NRESET(~reset), .NIRQ(nIRQ),
+    arm7tdmis_top cpu (.CLK(clock), .nRESET(~reset), .nIRQ(nIRQ),
                        .ADDR(addr_int), .WDATA(wdata_int), .RDATA(rdata),
                        .SIZE(size_int), .WRITE(write_int), .ABORT(abort),
-                       .PAUSE(pause | dmaActive), .MODE(mode), .NFIQ(1'b1),
+                       .PAUSE(pause | dmaActive), .MODE(mode), .nFIQ(1'b1),
                        .PREEMPTABLE(preemptable));
 
     assign addr = (dmaActive) ? 32'bz : addr_int;

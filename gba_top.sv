@@ -39,10 +39,46 @@ module gba_top (
 	output logic hblank,
 	output logic vblank,
 	
-	input logic [15:0] buttons
+	input logic [15:0] buttons,
+	
+	output logic [31:0] CART_ADDR,
+	input  logic [31:0] CART_DI,
+	output logic [31:0] CART_DO,	// For writes to Backup SRAM etc.
+	
+	output logic CART_RD,
+	output logic CART_WR,
+	
+	input logic CPU_PAUSE	
 );
 
 
+reg [31:0] cart_addr_reg;
+reg cart_rd_reg;
+reg cart_wr_reg;
+
+always @(posedge gba_clk) begin
+	cart_rd_reg <= 1'b0;
+	cart_wr_reg <= 1'b0;
+
+	if (bus_game_cs && !bus_write) begin
+		cart_addr_reg <= bus_addr;
+		cart_rd_reg <= 1'b1;
+	end
+	
+	if (bus_game_cs && bus_write) begin
+		cart_addr_reg <= bus_addr;
+		cart_wr_reg <= 1'b1;
+	end
+end
+
+
+	assign CART_ADDR = cart_addr_reg;
+	assign CART_DO = bus_wdata;
+	assign CART_WR = cart_wr_reg;
+	assign CART_RD = cart_rd_reg;
+	assign bus_game_rdata = CART_DI;
+
+	
     // 16.776 MHz clock for GBA/memory system
     //logic gba_clk, clk_100, clk_256, vga_clk;
 	 
@@ -80,6 +116,10 @@ module gba_top (
     (* mark_debug = "true" *) logic  [1:0] bus_size;
     (* mark_debug = "true" *) logic        bus_pause, bus_write;
 
+	 // Cart bus...
+	 logic [31:0] bus_game_addr;
+	 logic [31:0] bus_game_rdata;
+	 logic bus_game_cs;
 	 
     logic [31:0] gfx_vram_A_addr, gfx_vram_B_addr, gfx_vram_C_addr;
     logic [31:0] gfx_vram_A_addr2, gfx_palette_bg_addr;
@@ -100,7 +140,11 @@ module gba_top (
 	 assign VGA_VS = vcount>=196 && vcount<200;
 	 assign VGA_HS = hcount>=280 && hcount<290;
 	 
-	 assign VGA_DE = !(vblank | hblank);
+	 wire my_vblank = (vcount>0 && vcount<6);
+	 wire my_hblank = (hcount>8 && hcount<234);
+ 	 
+	assign VGA_DE = !(vblank | hblank);
+	//assign VGA_DE = !(my_vblank | my_hblank);
 	 
 	 
     assign vcount_match = (vcount == IO_reg_datas[`DISPSTAT_IDX][15:8]);
@@ -117,7 +161,7 @@ module gba_top (
 
     // CPU
 	cpu_top cpu (
-		.clock(gba_clk), .reset(BTND), .nIRQ, .pause(bus_pause),
+		.clock(gba_clk), .reset(BTND), .nIRQ, .pause(bus_pause | CPU_PAUSE),
 		.abort, .mode, .preemptable(cpu_preemptable),
 		.dmaActive, .rdata(bus_rdata), .addr(bus_addr),
 		.wdata(bus_wdata), .size(bus_size), .write(bus_write)
@@ -156,7 +200,12 @@ module gba_top (
 
 		.FIFO_re_A, .FIFO_re_B, .FIFO_clr_A, .FIFO_clr_B, .FIFO_val_A,
 		.FIFO_val_B, .FIFO_size_A, .FIFO_size_B,
-		.vblank, .hblank, .vcount_match
+		.vblank, .hblank, .vcount_match,
+		
+		.bus_game_addr( bus_game_addr ),		// output [31:0] bus_game_addr
+		.bus_game_rdata( bus_game_rdata ),	// input [31:0] bus_game_rdata
+		
+		.bus_game_cs( bus_game_cs )			// output bus_game_cs
 	);
 
 	graphics_system gfx (
