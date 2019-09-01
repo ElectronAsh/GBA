@@ -32,60 +32,66 @@
 `include "../gba_mmio_defines.vh"
 
 module mem_top (
-    input  logic clock, reset,
+	input  logic clock, reset,
 
-    /* Signals for CPU/DMA Bus */
-    input  logic [31:0] bus_addr,
-    input  logic [31:0] bus_wdata,
-    output logic [31:0] bus_rdata,
-    input  logic  [1:0] bus_size,
-    output logic        bus_pause,
-    input  logic        bus_write,
-    input  logic        dmaActive,
+	/* Signals for CPU/DMA Bus */
+	input  logic [31:0] bus_addr,
+	input  logic [31:0] bus_wdata,
+	output logic [31:0] bus_rdata,
+	input  logic  [1:0] bus_size,
+	output logic        bus_pause,
+	input  logic        bus_write,
+	input  logic        dmaActive,
 
-    // Signals for graphics Bus
-    input  logic [31:0] gfx_vram_A_addr, gfx_vram_B_addr, gfx_vram_C_addr,
-    input  logic [31:0] gfx_oam_addr, gfx_palette_bg_addr, gfx_palette_obj_addr,
-    input  logic [31:0] gfx_vram_A_addr2,
-    output logic [31:0] gfx_vram_A_data, gfx_vram_B_data, gfx_vram_C_data,
-    output logic [31:0] gfx_oam_data, gfx_palette_bg_data, gfx_palette_obj_data,
-    output logic [31:0] gfx_vram_A_data2,
+	// Signals for graphics Bus
+	input  logic [31:0] gfx_vram_A_addr, gfx_vram_B_addr, gfx_vram_C_addr,
+	input  logic [31:0] gfx_oam_addr, gfx_palette_bg_addr, gfx_palette_obj_addr,
+	input  logic [31:0] gfx_vram_A_addr2,
+	output logic [31:0] gfx_vram_A_data, gfx_vram_B_data, gfx_vram_C_data,
+	output logic [31:0] gfx_oam_data, gfx_palette_bg_data, gfx_palette_obj_data,
+	output logic [31:0] gfx_vram_A_data2,
 
-    // IO registers
-    output logic [31:0] IO_reg_datas [`NUM_IO_REGS-1:0],
+	// IO registers
+	output logic [31:0] IO_reg_datas [`NUM_IO_REGS-1:0],
 
-    // Values for R/O registers
-    input  logic [15:0] buttons, vcount, reg_IF,
-    input  logic        vcount_match, vblank, hblank,
-    output logic [15:0] int_acks,
-    input  logic [15:0] internal_TM0CNT_L, internal_TM1CNT_L, internal_TM2CNT_L,
-    input  logic [15:0] internal_TM3CNT_L,
-    output logic [15:0] TM0CNT_L, TM1CNT_L, TM2CNT_L, TM3CNT_L,
-    output logic        dsASqRst, dsBSqRst,
+	// Values for R/O registers
+	input  logic [15:0] buttons, vcount, reg_IF,
+	input  logic        vcount_match, vblank, hblank,
+	output logic [15:0] int_acks,
+	input  logic [15:0] internal_TM0CNT_L, internal_TM1CNT_L, internal_TM2CNT_L,
+	input  logic [15:0] internal_TM3CNT_L,
+	output logic [15:0] TM0CNT_L, TM1CNT_L, TM2CNT_L, TM3CNT_L,
+	output logic        dsASqRst, dsBSqRst,
 
-    // Value for DMA Sound FIFO
-    input  logic        FIFO_re_A, FIFO_re_B,
-    output logic [31:0] FIFO_val_A, FIFO_val_B,
-    output logic [3:0]  FIFO_size_A, FIFO_size_B,
-    input  logic        FIFO_clr_A, FIFO_clr_B,
+	// Value for DMA Sound FIFO
+	input  logic        FIFO_re_A, FIFO_re_B,
+	output logic [31:0] FIFO_val_A, FIFO_val_B,
+	output logic [3:0]  FIFO_size_A, FIFO_size_B,
+	input  logic        FIFO_clr_A, FIFO_clr_B,
+
+	output logic [31:0] bus_game_addr,
+	input logic [31:0] bus_game_rdata,
+
+	output wire bus_game_cs,
+
+	output logic io_write,
 	 
-	 output logic [31:0] bus_game_addr,
-	 input logic [31:0] bus_game_rdata,
-	 
-	 output wire bus_game_cs,
-	 
-	 output logic io_write,
-	 
-	input logic [31:0] io_reg_rdata
+	input logic [31:0] io_reg_rdata,
+	
+	output logic [31:0] bus_addr_lat1
 );
 
 	assign bus_game_cs = bus_game_read;
 
-	assign io_write = ((bus_addr_lat1 - `IO_REG_RAM_START) <= `IO_REG_RAM_SIZE) && bus_write;
+	//assign io_write = ((bus_addr_lat1 - `IO_REG_RAM_START) <= `IO_REG_RAM_SIZE) && bus_write;
+	
+	(*keep*) wire io_range = (bus_addr_lat1 >= 32'h0400_0000) && (bus_addr_lat1 <= 32'h0400_0807);
+	
+	assign io_write = io_range && bus_write_lat1;
 	
 
     /* Single cycle latency for writes */
-    logic [31:0] bus_addr_lat1;
+    //logic [31:0] bus_addr_lat1;
     logic [31:0] bus_mem_addr;
     logic  [1:0] bus_size_lat1;
     logic        bus_write_lat1;
@@ -116,10 +122,13 @@ module mem_top (
     // Registers to delay write signals
     mem_register #(32) baddr (.clock, .reset, .en(1'b1), .clr(1'b0),
                           .D(bus_addr), .Q(bus_addr_lat1));
-    mem_register #(1) bwrite (.clock, .reset, .en(1'b1), .clr(1'b0),
+    
+	 mem_register #(1) bwrite (.clock, .reset, .en(1'b1), .clr(1'b0),
                           .D(bus_write & ~bus_pause), .Q(bus_write_lat1));
-    mem_register #(2) bsize (.clock, .reset, .en(1'b1), .clr(1'b0),
+    
+	 mem_register #(2) bsize (.clock, .reset, .en(1'b1), .clr(1'b0),
                          .D(bus_size), .Q(bus_size_lat1));
+								 
     // Pauses due to writes, could be extended
     mem_register #(1) wpause (.clock, .reset, .en(1'b1), .clr(1'b0),
                          .D(bus_write & ~bus_pause), .Q(bus_pause));
@@ -327,8 +336,12 @@ module mem_top (
             bus_rdata_int = bus_palette_rdata;
         else if (read_in_oam)
             bus_rdata_int = bus_oam_rdata;
-        else if (bus_io_reg_read)
-            bus_rdata_int = bus_io_reg_rdata;
+        
+		  else if (bus_io_reg_read)
+            //bus_rdata_int = bus_io_reg_rdata;
+				//bus_rdata_int = (bus_addr_lat1>>2==`BG3X_L_IDX) ? io_reg_rdata : bus_io_reg_rdata;
+				bus_rdata_int = (bus_addr_lat1[11:0]>=12'h010 && bus_addr_lat1[11:0]<=12'h03E) ? io_reg_rdata : bus_io_reg_rdata;
+				
         else if (bus_pak_init_1_read)
             bus_rdata_int = {12'hFFF, bus_pak_init_1_addr[4:2], 1'b1,
                          12'hFFF, bus_pak_init_1_addr[4:2], 1'b0};

@@ -41,52 +41,52 @@ module graphics_system (
 
 
 	// Graphics regs...
-	logic [31:0] DISPCNT_REG;
-	logic [31:0] DISPSTAT_REG;
-	logic [31:0] VCOUNT_REG;
-	logic [31:0] BG0CNT_REG;
-	logic [31:0] BG1CNT_REG;
-	logic [31:0] BG2CNT_REG;
-	logic [31:0] BG3CNT_REG;
+	(*noprune*) logic [31:0] DISPCNT_REG;
+	(*noprune*) logic [31:0] DISPSTAT_REG;
+	(*noprune*) logic [31:0] VCOUNT_REG;
+	(*noprune*) logic [31:0] BG0CNT_REG;
+	(*noprune*) logic [31:0] BG1CNT_REG;
+	(*noprune*) logic [31:0] BG2CNT_REG;
+	(*noprune*) logic [31:0] BG3CNT_REG;
 
-	logic [31:0] BG0HOFS_REG;
-	logic [31:0] BG0VOFS_REG;
-	logic [31:0] BG1HOFS_REG;
-	logic [31:0] BG1VOFS_REG;
-	logic [31:0] BG2HOFS_REG;
-	logic [31:0] BG2VOFS_REG;
-	logic [31:0] BG3HOFS_REG;
-	logic [31:0] BG3VOFS_REG;
+	(*noprune*) logic [31:0] BG0HOFS_REG;
+	(*noprune*) logic [31:0] BG0VOFS_REG;
+	(*noprune*) logic [31:0] BG1HOFS_REG;
+	(*noprune*) logic [31:0] BG1VOFS_REG;
+	(*noprune*) logic [31:0] BG2HOFS_REG;
+	(*noprune*) logic [31:0] BG2VOFS_REG;
+	(*noprune*) logic [31:0] BG3HOFS_REG;
+	(*noprune*) logic [31:0] BG3VOFS_REG;
 
-	logic [31:0] BG2PA_REG;
-	logic [31:0] BG2PB_REG;
-	logic [31:0] BG2PC_REG;
-	logic [31:0] BG2PD_REG;
-	logic [31:0] BG2X_L_REG;
-	logic [31:0] BG2X_H_REG;
-	logic [31:0] BG2Y_L_REG;
-	logic [31:0] BG2Y_H_REG;
+	(*noprune*) logic [31:0] BG2PA_REG;
+	(*noprune*) logic [31:0] BG2PB_REG;
+	(*noprune*) logic [31:0] BG2PC_REG;
+	(*noprune*) logic [31:0] BG2PD_REG;
+	(*noprune*) logic [31:0] BG2X_L_REG;
+	(*noprune*) logic [31:0] BG2X_H_REG;
+	(*noprune*) logic [31:0] BG2Y_L_REG;
+	(*noprune*) logic [31:0] BG2Y_H_REG;
 
-	logic [31:0] BG3PA_REG;
-	logic [31:0] BG3PB_REG;
-	logic [31:0] BG3PC_REG;
-	logic [31:0] BG3PD_REG;
-	logic [31:0] BG3X_L_REG;
-	logic [31:0] BG3X_H_REG;
-	logic [31:0] BG3Y_L_REG;
-	logic [31:0] BG3Y_H_REG;
+	(*noprune*) logic [31:0] BG3PA_REG;
+	(*noprune*) logic [31:0] BG3PB_REG;
+	(*noprune*) logic [31:0] BG3PC_REG;
+	(*noprune*) logic [31:0] BG3PD_REG;
+	(*noprune*) logic [31:0] BG3X_L_REG;
+	(*noprune*) logic [31:0] BG3X_H_REG;
+	(*noprune*) logic [31:0] BG3Y_L_REG;
+	(*noprune*) logic [31:0] BG3Y_H_REG;
 
-	logic [31:0] WIN0H_REG;
-	logic [31:0] WIN1H_REG;
-	logic [31:0] WIN0V_REG;
-	logic [31:0] WIN1V_REG;
-	logic [31:0] WININ_REG;
-	logic [31:0] WINOUT_REG;
-	logic [31:0] MOSAIC_REG;
+	(*noprune*) logic [31:0] WIN0H_REG;
+	(*noprune*) logic [31:0] WIN1H_REG;
+	(*noprune*) logic [31:0] WIN0V_REG;
+	(*noprune*) logic [31:0] WIN1V_REG;
+	(*noprune*) logic [31:0] WININ_REG;
+	(*noprune*) logic [31:0] WINOUT_REG;
+	(*noprune*) logic [31:0] MOSAIC_REG;
 
-	logic [31:0] BLDCNT_REG;
-	logic [31:0] BLDALPHA_REG;
-	logic [31:0] BLDY_REG;
+	(*noprune*) logic [31:0] BLDCNT_REG;
+	(*noprune*) logic [31:0] BLDALPHA_REG;
+	(*noprune*) logic [31:0] BLDY_REG;
 	 
 always_ff @(posedge graphics_clock or posedge reset)
 if (reset) begin
@@ -94,7 +94,7 @@ if (reset) begin
 end
 else begin
 	if (io_write) begin
-		case ( io_addr >> 2 )
+		case ( io_addr>>2 )
 		`DISPCNT_IDX: DISPCNT_REG <= bus_wdata;
 		`VCOUNT_IDX: VCOUNT_REG <= bus_wdata;
 		`BG0CNT_IDX: BG0CNT_REG <= bus_wdata;
@@ -146,7 +146,7 @@ else begin
 end
 
 always_comb begin
-		case ( io_addr >> 2 )
+		case ( io_addr>>2 )
 		`DISPCNT_IDX: io_reg_rdata = DISPCNT_REG;
 
 		`VCOUNT_IDX: io_reg_rdata = VCOUNT_REG;

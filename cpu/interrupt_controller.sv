@@ -75,7 +75,7 @@ if (reset) begin
 end
 else begin
 	if (io_write) begin
-		case ( io_addr >> 2 )
+		case ( io_addr>>2 )
 		`IE_IDX: IE_REG <= bus_wdata;
 		`IF_IDX: IF_REG <= bus_wdata;
 		`WAITCNT_IDX: WAITCNT_REG <= bus_wdata;
@@ -86,7 +86,7 @@ else begin
 end
 
 always_comb begin
-		case ( io_addr >> 2 )
+		case ( io_addr>>2 )
 		`IE_IDX: io_reg_rdata = IE_REG;
 		`IF_IDX: io_reg_rdata = IF_REG;
 		`WAITCNT_IDX: io_reg_rdata = WAITCNT_REG;

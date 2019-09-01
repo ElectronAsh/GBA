@@ -167,7 +167,7 @@ if (reset) begin
 end
 else begin
 	if (io_write) begin
-		case ( io_addr >> 2 )
+		case ( io_addr>>2 )
 		`SOUND1CNT_L_IDX: SOUND1CNT_L_REG <= bus_wdata;
 		`SOUND1CNT_H_IDX: SOUND1CNT_H_REG <= bus_wdata;
 		`SOUND1CNT_X_IDX: SOUND1CNT_X_REG <= bus_wdata;
@@ -201,7 +201,7 @@ end
 
 
 always_comb begin
-		case ( io_addr >> 2 )
+		case ( io_addr>>2 )
 		`SOUND1CNT_L_IDX: io_reg_rdata = SOUND1CNT_L_REG;
 		`SOUND1CNT_H_IDX: io_reg_rdata = SOUND1CNT_H_REG;
 		`SOUND1CNT_X_IDX: io_reg_rdata = SOUND1CNT_X_REG;

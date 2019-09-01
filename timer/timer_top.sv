@@ -52,7 +52,7 @@ if (reset) begin
 end
 else begin
 	if (io_write) begin
-		case ( io_addr >> 2 )
+		case ( io_addr>>2 )
 		`TM0CNT_L_IDX: TM0CNT_L_REG <= bus_wdata;
 		`TM0CNT_H_IDX: TM0CNT_H_REG <= bus_wdata;
 		`TM1CNT_L_IDX: TM1CNT_L_REG <= bus_wdata;
@@ -67,7 +67,7 @@ else begin
 end
 	 
 always_comb begin
-		case ( io_addr >> 2 )
+		case ( io_addr>>2 )
 		`TM0CNT_L_IDX: io_reg_rdata = TM0CNT_L_REG;
 		`TM0CNT_H_IDX: io_reg_rdata = TM0CNT_H_REG;
 		`TM1CNT_L_IDX: io_reg_rdata = TM1CNT_L_REG;

@@ -208,8 +208,11 @@ end
 		
 		.io_write( io_write ),					// output io_write
 		
-		.io_reg_rdata( io_reg_rdata )			// input [31:0] io_reg_rdata (from all of the other sub-modules).
+		.io_reg_rdata( io_reg_rdata ),		// input [31:0] io_reg_rdata (from all of the other sub-modules).
+		
+		.bus_addr_lat1( bus_addr_lat1 )		// output [31:0] bus_addr_lat1
 	);
+	wire [31:0] bus_addr_lat1;
 
 	interrupt_controller intc (
 		.clock(gba_clk), .reset(BTND), .cpu_mode(mode), .nIRQ,
@@ -220,7 +223,7 @@ end
 		.timer2, .timer3, .serial(1'b0), .keypad(1'b0),
 		.game_pak(1'b0), .dma0, .dma1, .dma2, .dma3,
 		
-		.io_addr(bus_addr[11:0]),		// input [11:0] io_addr
+		.io_addr(bus_addr_lat1[11:0]),		// input [11:0] io_addr
 		.io_write(io_write),				// input io_write
 		
 		.bus_wdata( bus_wdata ),		// input [31:0] bus_wdata
@@ -241,7 +244,7 @@ end
 		.reset(BTND), .vcount, .hcount,
 		.VGA_R, .VGA_G, .VGA_B,/*, .VGA_HS, .VGA_VS*/
 		
-		.io_addr(bus_addr[11:0]),		// input [11:0] io_addr
+		.io_addr(bus_addr_lat1[11:0]),		// input [11:0] io_addr
 		.io_write(io_write),				// input io_write
 		
 		.bus_wdata( bus_wdata ),		// input [31:0] bus_wdata
@@ -270,7 +273,7 @@ end
 		.hcount({7'd0, hcount}),
 		.cpu_preemptable(cpu_preemptable),
 		
-		.io_addr(bus_addr[11:0]),		// input [11:0] io_addr
+		.io_addr(bus_addr_lat1[11:0]),		// input [11:0] io_addr
 		.io_write(io_write),				// input io_write
 		//.bus_wdata( bus_wdata ),		// input [31:0] bus_wdata. (not needed, as the DMA module already has this input)
 		
@@ -285,7 +288,7 @@ end
 		.genIRQ0(timer0), .genIRQ1(timer1), .genIRQ2(timer2),
 		.genIRQ3(timer3),
 		
-		.io_addr(bus_addr[11:0]),		// input [11:0] io_addr
+		.io_addr(bus_addr_lat1[11:0]),		// input [11:0] io_addr
 		.io_write(io_write),				// input io_write
 		.bus_wdata( bus_wdata ),		// input [31:0] bus_wdata
 		
@@ -305,7 +308,7 @@ end
 		.FIFO_re_A, .FIFO_re_B, .FIFO_clr_A, .FIFO_clr_B, .FIFO_val_A,
 		.FIFO_val_B, .FIFO_size_A, .FIFO_size_B,
 		
-		.io_addr(bus_addr[11:0]),		// input [11:0] io_addr
+		.io_addr(bus_addr_lat1[11:0]),		// input [11:0] io_addr
 		.io_write(io_write),				// input io_write
 		.bus_wdata( bus_wdata ),		// input [31:0] bus_wdata
 		

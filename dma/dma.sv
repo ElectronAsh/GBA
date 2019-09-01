@@ -519,7 +519,7 @@ if (!rst_b) begin
 end
 else begin
 	if (io_write) begin
-		case ( io_addr >> 2 )
+		case ( io_addr>>2 )
 		`DMA0SAD_L_IDX: DMA0SAD_L_REG <= bus_wdata;
 		`DMA0SAD_H_IDX: DMA0SAD_H_REG <= bus_wdata;
 		`DMA0DAD_L_IDX: DMA0DAD_L_REG <= bus_wdata;
@@ -550,7 +550,7 @@ else begin
 end
 			
 always_comb begin
-		case ( io_addr >> 2 )
+		case ( io_addr>>2 )
 		`DMA0SAD_L_IDX: io_reg_rdata = DMA0SAD_L_REG;
 		`DMA0SAD_H_IDX: io_reg_rdata = DMA0SAD_H_REG;
 		`DMA0DAD_L_IDX: io_reg_rdata = DMA0DAD_L_REG;
